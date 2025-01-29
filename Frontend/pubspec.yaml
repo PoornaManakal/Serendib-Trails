@@ -60,6 +60,9 @@ flutter:
   assets:
     - lib/assets/images/welcome_bg.png
     - lib/assets/images/logo.png 
+    - lib/assets/images/landing1.jpg
+    - lib/assets/images/landing2.jpg
+    - lib/assets/images/landing3.jpg
 
   # To add assets to your application, add an assets section, like this:
   # assets:
