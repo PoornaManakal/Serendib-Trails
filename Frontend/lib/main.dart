@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'screens/welcomepage.dart';
 import 'screens/splashscreen.dart';
+import 'screens/LandingPage1.dart';
+import 'screens/LandingPage2.dart';
+import 'screens/LandingPage3.dart';
 
 void main() {
   runApp(const SerendibApp());
@@ -17,6 +20,9 @@ class SerendibApp extends StatelessWidget {
       routes: {
         '/': (context) => const SplashScreen(),
         '/welcome': (context) => const WelcomePage(),
+        '/LandingPage1': (context) => const LandingPage1(),
+        '/LandingPage2': (context) => const LandingPage2(),
+        '/LandingPage3': (context) => const LandingPage3(),
       },
     );
   }
