@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:serendib_trails/screens/LandingPage1.dart';
+import 'package:serendib_trails/screens/LandingPage.dart';
+
 class WelcomePage extends StatelessWidget {
   const WelcomePage({super.key});
 
@@ -96,7 +97,7 @@ class WelcomePage extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const LandingPage1(),
+                          builder: (context) => const LandingPage(),
                         ),
                       );
                       
