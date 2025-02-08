@@ -59,8 +59,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                     suffixIcon: IconButton(
                       icon: Icon(
                         _isPasswordHidden
-                            ? Icons.visibility
-                            : Icons.visibility_off,
+                            ? Icons.visibility_off
+                            : Icons.visibility,
                       ),
                       onPressed: () {
                         setState(() {
@@ -81,8 +81,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                     suffixIcon: IconButton(
                       icon: Icon(
                         _isConfirmPasswordHidden
-                            ? Icons.visibility
-                            : Icons.visibility_off,
+                            ? Icons.visibility_off
+                            : Icons.visibility,
                       ),
                       onPressed: () {
                         setState(() {

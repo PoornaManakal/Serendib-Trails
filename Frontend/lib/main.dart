@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:serendib_trails/screens/Login_Screens/SignIn_screen.dart';
+import 'package:serendib_trails/screens/Login_Screens/SignUp_screen.dart';
 import 'screens/welcomepage.dart';
 import 'screens/splashscreen.dart';
 import 'screens/LandingPage1.dart';
@@ -25,6 +27,8 @@ class SerendibApp extends StatelessWidget {
         '/LandingPage1': (context) => const LandingPage1(),
         '/LandingPage2': (context) => const LandingPage2(),
         '/LandingPage3': (context) => const LandingPage3(),
+        '/signup' : (context) => const SignupScreen(),
+        '/signin' : (context) => const SigninScreen(),
         '/New_log': (context) => const NewLog(),
         '/select_interests_screen': (context) => SelectInterestsScreen(),
       },

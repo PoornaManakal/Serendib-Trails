@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:serendib_trails/screens/LandingPage1.dart';
+//import 'package:serendib_trails/screens/LandingPage1.dart';
+import 'package:serendib_trails/screens/Login_Screens/SignIn_screen.dart';
 
 class LandingPage3 extends StatelessWidget {
   const LandingPage3({super.key});
@@ -124,7 +125,7 @@ class LandingPage3 extends StatelessWidget {
                         context,
                         PageRouteBuilder(
                           pageBuilder: (context, animation, secondaryAnimation) =>
-                              const LandingPage1(),
+                              const SigninScreen(),
                           transitionsBuilder: (context, animation, secondaryAnimation, child) {
                             const begin = Offset(1.0, 0.0); // Slide from right
                             const end = Offset.zero;
