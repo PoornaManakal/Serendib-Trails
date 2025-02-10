@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "57768417857",
+    "project_id": "serendib-trails-sdgp",
+    "storage_bucket": "serendib-trails-sdgp.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:57768417857:android:d47d6e6b8df7019b4e84c0",
+        "android_client_info": {
+          "package_name": "com.example.serendib_trails"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCbg3HyBW9b-J3_UdhDStN7Hy96sT4zpz0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
