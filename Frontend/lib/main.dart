@@ -31,7 +31,7 @@ class SerendibApp extends StatelessWidget {
         '/signin' : (context) => const SigninScreen(),
         '/New_log': (context) => const NewLog(),
         '/select_interests_screen': (context) => SelectInterestsScreen(),
-        '/home':(context) => const Home()
+        '/home':(context) => const HomeScreen()
       },
     );
   }

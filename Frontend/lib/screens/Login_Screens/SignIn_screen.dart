@@ -32,8 +32,11 @@ class _SigninScreenState extends State<SigninScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Login Successful')),
         );
+        _emailController.clear();
+        _passwordController.clear();
         // Navigate to home screen or dashboard after successful login
-        Navigator.pushNamed(context, '/home');
+        Navigator.pushReplacementNamed(context, '/home');
+
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Login Failed: $e')),

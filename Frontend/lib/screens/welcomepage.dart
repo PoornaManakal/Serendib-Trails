@@ -16,7 +16,8 @@ class WelcomePage extends StatelessWidget {
           Positioned.fill(
             child: ColorFiltered(
               colorFilter: ColorFilter.mode(
-                Colors.black.withAlpha(150),  // Adjust alpha (0-255) for darkness
+                Colors.black
+                    .withAlpha(150), // Adjust alpha (0-255) for darkness
                 BlendMode.darken,
               ),
               child: Image.asset(
@@ -82,7 +83,6 @@ class WelcomePage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 30),
-                
                 Container(
                   margin: EdgeInsets.only(bottom: screenHeight * 0.08),
                   width: screenWidth * 0.8,
@@ -94,13 +94,12 @@ class WelcomePage extends StatelessWidget {
                   child: TextButton(
                     onPressed: () {
                       // Define navigation or further actions
-                      Navigator.push(
+                      Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
                           builder: (context) => const LandingPage(),
                         ),
                       );
-                      
                     },
                     child: const Text(
                       'Get Started',

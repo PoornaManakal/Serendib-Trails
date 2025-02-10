@@ -83,7 +83,7 @@ class _LandingPageState extends State<LandingPage> {
                     );
                   } else {
                     // Handle final action like navigation to home screen
-                    Navigator.pushNamed(context, '/signin');
+                    Navigator.pushReplacementNamed(context, '/signin');
                   }
                 },
                 style: ElevatedButton.styleFrom(
