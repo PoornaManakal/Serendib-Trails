@@ -38,8 +38,25 @@ class _HomeScreenState extends State<HomeScreen> {
                          fit: BoxFit.cover,
                     )
                   ),
+                  child: const Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Padding(
+                      padding: EdgeInsets.only(bottom:16),
+                      child: Text(
+                        "Sigiriya AR View",
+                        style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 25,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 3
+                    )
+                    ),
+                  ),
             ),
+            ),
+
               ],
+
             ),
           )
     ),
