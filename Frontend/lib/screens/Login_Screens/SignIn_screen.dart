@@ -142,8 +142,32 @@ class _SigninScreenState extends State<SigninScreen> {
                     Color(0xFF0B5739), // Changed cursor color to match focus
               ),
             ),
+            const SizedBox(height: 10),
 
-            const SizedBox(height: 30),
+            Align(
+              alignment :Alignment.centerLeft,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: TextButton(
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/New_log');
+                  },
+                  child: const Text(
+                    'Forgot Password?',
+                    style: TextStyle(
+                      color: Color(0xFF0B5739),
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+                ),
+                  
+                  
+                ),
+            ),
+
+            const SizedBox(height: 20),
 
             // Continue Button
             Container(
