@@ -30,7 +30,9 @@ class _SigninScreenState extends State<SigninScreen> {
           password: _passwordController.text.trim(),
         );
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Login Successful')),
+          const SnackBar(content: Text('Login Successful'),
+          backgroundColor: Colors.green,),
+          
         );
         _emailController.clear();
         _passwordController.clear();
@@ -39,7 +41,8 @@ class _SigninScreenState extends State<SigninScreen> {
 
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Login Failed: $e')),
+          SnackBar(content: Text('Login Failed: Email or Password is incorrect'),
+          backgroundColor: Colors.red,),
         );
       }finally {
         setState(() {
@@ -213,7 +216,7 @@ class _SigninScreenState extends State<SigninScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: TextButton(
                     onPressed: () {
-                      Navigator.pushNamed(context, '/New_log');
+                      Navigator.pushNamed(context, '/Reset_Password');
                     },
                     child: const Text(
                       'Forgot Password?',
@@ -279,7 +282,7 @@ class _SigninScreenState extends State<SigninScreen> {
                       ),
                       recognizer: TapGestureRecognizer()
                         ..onTap = () {
-                          Navigator.pushNamed(context, '/signup');
+                          Navigator.pushReplacementNamed(context, '/signup');
                         },
                     ),
                   ],

@@ -47,8 +47,17 @@ class _SignupScreenState extends State<SignupScreen> {
           'role': 'user', // Default role, modify as needed
         });
 
-        ScaffoldMessenger.of(context)
-            .showSnackBar(const SnackBar(content: Text('Signup successful')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Signup successful'),
+            backgroundColor: Colors.green,
+          ),
+        );
+
+        _nameController.clear();
+        _emailController.clear();
+        _passwordController.clear();
+        _confirmPasswordController.clear();
 
         // Navigate to the next screen after successful signup
         Navigator.pushReplacementNamed(
@@ -56,7 +65,11 @@ class _SignupScreenState extends State<SignupScreen> {
       } on FirebaseAuthException catch (e) {
         // Handle errors
         ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(e.message ?? 'Signup failed')));
+          SnackBar(
+            content: Text(e.message ?? 'Signup failed'),
+            backgroundColor: Colors.red,
+          ),
+        );
       } finally {
         setState(() {
           _isLoading = false;
@@ -308,8 +321,8 @@ class _SignupScreenState extends State<SignupScreen> {
                   ? const CircularProgressIndicator(
                       valueColor: AlwaysStoppedAnimation<Color>(
                           Color(0xFF0B5739)), // Change color
-                    ):
-                  
+                    )
+                  :
 
                   // Continue Button
                   Container(
@@ -354,7 +367,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       ),
                       recognizer: TapGestureRecognizer()
                         ..onTap = () {
-                          Navigator.pushNamed(context, '/signin');
+                          Navigator.pushReplacementNamed(context, '/signin');
                         },
                     ),
                   ],
