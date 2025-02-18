@@ -2,6 +2,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:serendib_trails/screens/Login_Screens/SignIn_screen.dart';
+import 'package:serendib_trails/screens/map/map_page.dart';
+import 'package:serendib_trails/screens/map/select_interests_screen.dart';
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -66,6 +69,28 @@ class _HomeScreenState extends State<HomeScreen> {
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 20),
+            ElevatedButton(
+              child: Text("Click me"),
+              onPressed: () {
+                // Add button press logic here
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => SelectInterestsScreen()),
+                );
+              },
+            ),
+            ElevatedButton(
+              child: Text("Map"),
+              onPressed: () {
+                // Add button press logic here
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => MapPage()),
+                );
+              },
+            ),
             ElevatedButton(
               child: Text("Logout"),
               onPressed: () async {
