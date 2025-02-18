@@ -53,7 +53,7 @@ class _ResetPasswordState extends State<ResetPassword> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor:
-          Colors.white, // Background color), // Dark green background
+          Colors.white, 
       body: SingleChildScrollView(
         child: Form(
           key: _formKey,
