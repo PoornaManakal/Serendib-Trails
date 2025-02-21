@@ -37,6 +37,7 @@ class _HomeScreenState extends State<HomeScreen>
             child: Column(
               children: [
 
+                //Image with texts
                 Container(
                   width: double.infinity,
                   height: 253,
@@ -64,7 +65,32 @@ class _HomeScreenState extends State<HomeScreen>
             ),
             ),
 
-              ],
+                const SizedBox(height : 19,),
+
+                Expanded(
+                    child: GridView.count(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 9,
+                      mainAxisSpacing: 9,
+                      children : model3dlist.map((each3dItem)
+                        {
+                          return Card(
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(19),
+                                image: DecorationImage(
+                                  image: NetworkImage(each3dItem["photoUrl"]),
+                                  fit: BoxFit.cover,
+                                ),
+
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                    )
+
+
+                )],
 
             ),
           )
