@@ -4,7 +4,7 @@ import 'package:serendib_trails/screens/LandingPage.dart';
 import 'package:serendib_trails/screens/Login_Screens/ResetPassword_screen.dart';
 import 'package:serendib_trails/screens/Login_Screens/SignIn_screen.dart';
 import 'package:serendib_trails/screens/Login_Screens/SignUp_screen.dart';
-import 'package:serendib_trails/screens/map/map_page.dart';
+import 'package:serendib_trails/screens/main_screen.dart';
 import 'package:serendib_trails/screens/map/select_interests_screen.dart';
 import 'screens/welcomepage.dart';
 import 'screens/splashscreen.dart';
@@ -34,7 +34,8 @@ class SerendibApp extends StatelessWidget {
         '/signin': (context) => const SigninScreen(),
         '/Reset_Password': (context) => const ResetPassword(),
         '/select_interests_screen': (context) => SelectInterestsScreen(),
-        '/home': (context) => const HomeScreen()
+        '/home': (context) => const HomeScreen(),
+        '/main': (context) =>  MainScreen()
       },
     );
   }

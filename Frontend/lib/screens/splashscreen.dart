@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:serendib_trails/screens/Home.dart';
 import 'package:serendib_trails/screens/LandingPage.dart';
-import 'package:serendib_trails/screens/Login_Screens/SignIn_screen.dart';
+import 'package:serendib_trails/screens/main_screen.dart';
 //import 'package:serendib_trails/screens/Home/home_scree.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -28,10 +28,10 @@ class _SplashScreenState extends State<SplashScreen> {
         // User is logged in, go to HomeScreen
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
+          MaterialPageRoute(builder: (context) =>  MainScreen()),
         );
       } else {
-        // User is NOT logged in, go to SignInScreen
+        // User is NOT logged in, go to LandingPage
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const LandingPage()),
