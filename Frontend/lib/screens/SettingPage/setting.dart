@@ -7,7 +7,7 @@ import 'package:serendib_trails/screens/Explore.dart';
 import 'package:serendib_trails/screens/Home.dart';
 import 'package:serendib_trails/screens/Login_Screens/SignIn_screen.dart';
 import 'package:serendib_trails/screens/SettingPage/AboutPage.dart';
-import 'package:serendib_trails/screens/SettingPage/AccountPage.dart';
+import 'package:serendib_trails/screens/SettingPage/UpdatePassword.dart';
 import 'package:serendib_trails/screens/SettingPage/ProfilePage.dart';
 import 'package:serendib_trails/screens/SettingPage/SettingsPage.dart';
 import 'package:flutter_social_button/flutter_social_button.dart';
@@ -102,19 +102,19 @@ class _SettingScreenState extends State<SettingScreen> {
             Row(
               children: [
                 GestureDetector(
-                   onTap: () {
+                  onTap: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => ProfilePage()),
                     );
                   },
-                child: CircleAvatar(
-                  radius: 30,
-                  backgroundImage: profilePicUrl.isNotEmpty
-                      ? NetworkImage(profilePicUrl)
-                      : AssetImage('lib/assets/images/default_profile.jpg')
-                          as ImageProvider,
-                ),
+                  child: CircleAvatar(
+                    radius: 30,
+                    backgroundImage: profilePicUrl.isNotEmpty
+                        ? NetworkImage(profilePicUrl)
+                        : AssetImage('lib/assets/images/default_profile.jpg')
+                            as ImageProvider,
+                  ),
                 ),
                 SizedBox(width: 10),
                 Column(
@@ -155,7 +155,7 @@ class _SettingScreenState extends State<SettingScreen> {
             MenuItem(
               icon: Icons.security,
               title: "Account",
-              page: ResetPasswordPage(),
+              page: UpdatePasswordPage(),
               iconColor: Color(0xFF0B5739),
               textColor: Color(0xFF0B5739),
             ),
@@ -237,7 +237,7 @@ class MenuItem extends StatelessWidget {
   final Widget page;
   final Color iconColor;
   final Color textColor;
-  
+
   MenuItem({
     required this.icon,
     required this.title,
