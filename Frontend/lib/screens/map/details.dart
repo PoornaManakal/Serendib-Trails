@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:serendib_trails/screens/main_screen.dart';
 
 final String googleApiKey = dotenv.env['GOOGLE_MAPS_API_KEY'] ?? "";
 
@@ -13,11 +14,32 @@ class TripDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     Map<String, dynamic>? suggestedPlaces = trip['suggestedPlaces'] as Map<String, dynamic>?;
 
-    return Scaffold(
+    return WillPopScope(
+      onWillPop: () async {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => MainScreen()),
+        );
+        return false;
+      },
+    child: Scaffold(
       appBar: AppBar(
-        title: Text('Trip Details'),
-        backgroundColor: Color(0xFF0B5739),
-      ),
+          title: Text(
+            "Trip Details",
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          ),
+          backgroundColor: Color(0xFF0B5739),
+          elevation: 0,
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => MainScreen()),
+              );
+            },
+          ),
+        ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -110,6 +132,7 @@ class TripDetailScreen extends StatelessWidget {
           ],
         ),
       ),
+    ),
     );
   }
 }

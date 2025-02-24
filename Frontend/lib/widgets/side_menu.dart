@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:serendib_trails/screens/Login_Screens/SignIn_screen.dart';
 import 'package:serendib_trails/screens/SettingPage/ProfilePage.dart';
-import 'package:serendib_trails/screens/SettingPage/setting.dart';
+import 'package:serendib_trails/screens/main_screen.dart';
 import 'package:serendib_trails/screens/map/map_page.dart';
 
 class SideMenu extends StatefulWidget {
@@ -16,7 +16,6 @@ class _SideMenuState extends State<SideMenu> {
   String userName = "User";
   String userEmail = "Loading...";
   String profilePicUrl = "";
-
 
   @override
   void initState() {
@@ -35,10 +34,19 @@ class _SideMenuState extends State<SideMenu> {
         setState(() {
           userName = snapshot.data()?['name'] ?? 'User';
           userEmail = snapshot.data()?['email'] ?? 'No Email';
-           profilePicUrl = snapshot.data()?['profilePic'] ?? '';
+          profilePicUrl = snapshot.data()?['profilePic'] ?? '';
         });
       }
     }
+  }
+
+  void navigateToPage(int index) {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => MainScreen(selectedIndex: index),
+      ),
+    );
   }
 
   @override
@@ -62,12 +70,12 @@ class _SideMenuState extends State<SideMenu> {
                         MaterialPageRoute(builder: (context) => ProfilePage()),
                       );
                     },
-                  child:CircleAvatar(
-                    radius: 40, // Avatar size
-                    backgroundImage: profilePicUrl.isNotEmpty
-                        ? NetworkImage(profilePicUrl)
-                        : AssetImage('lib/assets/images/default_profile.jpg') as ImageProvider,
-                  ),
+                    child: CircleAvatar(
+                      radius: 40, // Avatar size
+                      backgroundImage: profilePicUrl.isNotEmpty
+                          ? NetworkImage(profilePicUrl)
+                          : AssetImage('lib/assets/images/default_profile.jpg') as ImageProvider,
+                    ),
                   ),
                   SizedBox(height: 10),
                   Text(
@@ -94,13 +102,15 @@ class _SideMenuState extends State<SideMenu> {
                     leading: Icon(Icons.home, color: Color(0xFF0B5739)),
                     title: Text("Home", style: TextStyle(color: Color(0xFF0B5739))),
                     onTap: () {
-                      Navigator.pop(context);
+                       Navigator.pop(context);
                     },
                   ),
                   ListTile(
                     leading: Icon(Icons.bookmark, color: Color(0xFF0B5739)),
                     title: Text("Favourites", style: TextStyle(color: Color(0xFF0B5739))),
-                    onTap: () {},
+                    onTap: () {
+                      navigateToPage(1);
+                    },
                   ),
                   ListTile(
                     leading: Icon(Icons.map, color: Color(0xFF0B5739)),
@@ -113,7 +123,7 @@ class _SideMenuState extends State<SideMenu> {
                     leading: Icon(Icons.settings, color: Color(0xFF0B5739)),
                     title: Text("Settings", style: TextStyle(color: Color(0xFF0B5739))),
                     onTap: () {
-                      Navigator.push(context, MaterialPageRoute(builder:  (context) => SettingScreen()));
+                      navigateToPage(4);
                     },
                   ),
                   Divider(color: Colors.black12),

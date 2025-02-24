@@ -1,29 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:serendib_trails/screens/BucketListPage.dart';
-import 'package:serendib_trails/screens/Create_a_plan.dart';
-import 'package:serendib_trails/screens/Explore.dart';
-import 'package:serendib_trails/screens/Home.dart';
 import 'package:serendib_trails/screens/Login_Screens/SignIn_screen.dart';
 import 'package:serendib_trails/screens/SettingPage/AboutPage.dart';
 import 'package:serendib_trails/screens/SettingPage/UpdatePassword.dart';
 import 'package:serendib_trails/screens/SettingPage/ProfilePage.dart';
 import 'package:serendib_trails/screens/SettingPage/SettingsPage.dart';
-import 'package:flutter_social_button/flutter_social_button.dart';
-import 'package:serendib_trails/screens/map/select_interests_screen.dart';
-import 'package:serendib_trails/widgets/nav_bar.dart';
+import 'package:serendib_trails/screens/main_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
-
-class Setting extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: SettingScreen(),
-    );
-  }
-}
 
 class SettingScreen extends StatefulWidget {
   @override
@@ -31,7 +15,6 @@ class SettingScreen extends StatefulWidget {
 }
 
 class _SettingScreenState extends State<SettingScreen> {
-  int _currentIndex = 4; // Index for bottom navigation
   User? user;
   String userName = "";
   String userEmail = "";
@@ -60,165 +43,158 @@ class _SettingScreenState extends State<SettingScreen> {
     }
   }
 
-  //List of pages for Bottom Navigation
-  final List<Widget> _pages = [
-    HomeScreen(),
-    ExplorePage(),
-    SelectInterestsScreen(),
-    BucketListPage(),
-    SettingScreen(),
-  ];
-
-  void _onTap(int index) {
-    setState(() {
-      _currentIndex = index;
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => _pages[index]),
-      );
-    });
+  Future<bool> _onWillPop() async {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => MainScreen()),
+    );
+    return false;
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {},
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Color(0xFF0B5739),
+          elevation: 0,
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => MainScreen()),
+              );
+            },
+          ),
+          title: Text(
+            "Settings",
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          ),
         ),
-        title: Text(
-          "Settings",
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-        ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => ProfilePage()),
-                    );
-                  },
-                  child: CircleAvatar(
-                    radius: 30,
-                    backgroundImage: profilePicUrl.isNotEmpty
-                        ? NetworkImage(profilePicUrl)
-                        : AssetImage('lib/assets/images/default_profile.jpg')
-                            as ImageProvider,
-                  ),
-                ),
-                SizedBox(width: 10),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      userName,
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                    Text(
-                      userEmail,
-                      style: TextStyle(color: Colors.grey, fontSize: 14),
-                    ),
-                  ],
-                ),
-                Spacer(),
-                IconButton(
-                  icon: Icon(Icons.logout, color: Colors.red),
-                  onPressed: () {
-                    FirebaseAuth.instance.signOut();
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => SigninScreen()),
-                    );
-                  },
-                ),
-              ],
-            ),
-            SizedBox(height: 30),
-            MenuItem(
-              icon: Icons.person,
-              title: "Profile",
-              page: ProfilePage(),
-              iconColor: Color(0xFF0B5739),
-              textColor: Color(0xFF0B5739),
-            ),
-            MenuItem(
-              icon: Icons.security,
-              title: "Account",
-              page: UpdatePasswordPage(),
-              iconColor: Color(0xFF0B5739),
-              textColor: Color(0xFF0B5739),
-            ),
-            MenuItem(
-              icon: Icons.settings,
-              title: "Settings",
-              page: SettingsPage(),
-              iconColor: Color(0xFF0B5739),
-              textColor: Color(0xFF0B5739),
-            ),
-            MenuItem(
-              icon: Icons.info,
-              title: "About",
-              page: AboutPage(),
-              iconColor: Color(0xFF0B5739),
-              textColor: Color(0xFF0B5739),
-            ),
-            Spacer(),
-            Center(
-              child: Column(
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
                 children: [
-                  Text(
-                    "Designed & Developed by\nTeam Serendib Trails",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => ProfilePage()),
+                      );
+                    },
+                    child: CircleAvatar(
+                      radius: 30,
+                      backgroundImage: profilePicUrl.isNotEmpty
+                          ? NetworkImage(profilePicUrl)
+                          : AssetImage('lib/assets/images/default_profile.jpg')
+                              as ImageProvider,
+                    ),
                   ),
-                  SizedBox(height: 10),
-                  Text("Catch us on"),
-                  SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  SizedBox(width: 10),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      GestureDetector(
-                        onTap: () => _launchURL(
-                            "https://www.instagram.com/serendibtrailsofficial?igsh=M2NrbnY5a2toMGFo"),
-                        child: Image.asset('lib/assets/images/ing.png',
-                            width: 30, height: 30),
+                      Text(
+                        userName,
+                        style:
+                            TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                       ),
-                      SizedBox(width: 10),
-                      GestureDetector(
-                        onTap: () => _launchURL(
-                            "https://www.facebook.com/share/162tHP81Ey/"),
-                        child: Image.asset('lib/assets/images/facebook.png',
-                            width: 30, height: 30),
-                      ),
-                      SizedBox(width: 10),
-                      GestureDetector(
-                        onTap: () => _launchURL(
-                            "https://www.linkedin.com/company/serenedib-trails-lk"),
-                        child: Image.asset('lib/assets/images/link.png',
-                            width: 30, height: 30),
+                      Text(
+                        userEmail,
+                        style: TextStyle(color: Colors.grey, fontSize: 14),
                       ),
                     ],
                   ),
+                  Spacer(),
+                  IconButton(
+                    icon: Icon(Icons.logout, color: Colors.red),
+                    onPressed: () {
+                      FirebaseAuth.instance.signOut();
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => SigninScreen()),
+                      );
+                    },
+                  ),
                 ],
               ),
-            ),
-          ],
+              SizedBox(height: 30),
+              MenuItem(
+                icon: Icons.person,
+                title: "Profile",
+                page: ProfilePage(),
+                iconColor: Color(0xFF0B5739),
+                textColor: Color(0xFF0B5739),
+              ),
+              MenuItem(
+                icon: Icons.security,
+                title: "Account",
+                page: UpdatePasswordPage(),
+                iconColor: Color(0xFF0B5739),
+                textColor: Color(0xFF0B5739),
+              ),
+              MenuItem(
+                icon: Icons.settings,
+                title: "Settings",
+                page: SettingsPage(),
+                iconColor: Color(0xFF0B5739),
+                textColor: Color(0xFF0B5739),
+              ),
+              MenuItem(
+                icon: Icons.info,
+                title: "About",
+                page: AboutPage(),
+                iconColor: Color(0xFF0B5739),
+                textColor: Color(0xFF0B5739),
+              ),
+              Spacer(),
+              Center(
+                child: Column(
+                  children: [
+                    Text(
+                      "Designed & Developed by\nTeam Serendib Trails",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 10),
+                    Text("Catch us on"),
+                    SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        GestureDetector(
+                          onTap: () => _launchURL(
+                              "https://www.instagram.com/serendibtrailsofficial?igsh=M2NrbnY5a2toMGFo"),
+                          child: Image.asset('lib/assets/images/ing.png',
+                              width: 30, height: 30),
+                        ),
+                        SizedBox(width: 10),
+                        GestureDetector(
+                          onTap: () => _launchURL(
+                              "https://www.facebook.com/share/162tHP81Ey/"),
+                          child: Image.asset('lib/assets/images/facebook.png',
+                              width: 30, height: 30),
+                        ),
+                        SizedBox(width: 10),
+                        GestureDetector(
+                          onTap: () => _launchURL(
+                              "https://www.linkedin.com/company/serenedib-trails-lk"),
+                          child: Image.asset('lib/assets/images/link.png',
+                              width: 30, height: 30),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
-      ),
-      bottomNavigationBar: BottomNavBar(
-        currentIndex: _currentIndex,
-        onTap: _onTap,
       ),
     );
   }
