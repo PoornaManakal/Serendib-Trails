@@ -5,9 +5,10 @@ import 'package:http/http.dart' as http;
 import 'package:geolocator/geolocator.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:math';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 final String googleApiKey = dotenv.env['GOOGLE_MAPS_API_KEY'] ?? "";
-
 
 class AttractionsScreen extends StatefulWidget {
   final List<String> selectedInterests;
@@ -22,6 +23,11 @@ class _AttractionsScreenState extends State<AttractionsScreen> {
   List<dynamic> _places = [];
   Map<String, List<dynamic>> suggestedPlaces = {};
   Set<String> previousSuggestions = {};
+  TextEditingController locationController = TextEditingController();
+  List<dynamic> _autocompleteResults = [];
+  double? inputLatitude;
+  double? inputLongitude;
+  FocusNode _focusNode = FocusNode();
 
   final Map<String, String> categoryKeywords = {
     "Culture": "cultural center|heritage site|historical district",
@@ -68,25 +74,75 @@ class _AttractionsScreenState extends State<AttractionsScreen> {
     setState(() {});
   }
 
+  Future<void> _fetchAutocompleteSuggestions(String input) async {
+    if (input.isEmpty) {
+      setState(() {
+        _autocompleteResults = [];
+      });
+      return;
+    }
+
+    String url =
+        "https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${Uri.encodeComponent(input)}&components=country:LK&key=$googleApiKey";
+
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      setState(() {
+        _autocompleteResults = data["predictions"];
+      });
+    }
+  }
+
+  Future<void> _convertPlaceIdToCoordinates(String placeId) async {
+    String url =
+        "https://maps.googleapis.com/maps/api/geocode/json?place_id=$placeId&key=$googleApiKey";
+
+    final response = await http.get(Uri.parse(url));
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      if (data["results"].isNotEmpty) {
+        setState(() {
+          inputLatitude = data["results"][0]["geometry"]["location"]["lat"];
+          inputLongitude = data["results"][0]["geometry"]["location"]["lng"];
+          _autocompleteResults = []; // Clear suggestions after selection
+          locationController.clear(); // Clear input field after selection
+        });
+        fetchPlaces(); // Fetch attractions after getting new coordinates
+      }
+    }
+  }
+
   String? _pageToken;
   double _offset = 0;
 
   Future<void> fetchPlaces() async {
-    // Clear the previous suggestions on each fetch
     suggestedPlaces.clear();
-    previousSuggestions.clear(); // Reset previous suggestions set
+    previousSuggestions.clear();
 
-    if (_currentPosition != null) {
+    double? latitude;
+    double? longitude;
+
+    if (inputLatitude != null && inputLongitude != null) {
+      latitude = inputLatitude;
+      longitude = inputLongitude;
+    } else {
+      latitude = _currentPosition?.latitude;
+      longitude = _currentPosition?.longitude;
+    }
+
+    if (latitude != null && longitude != null) {
       _offset +=
           0.01; // Increase the offset every time the regenerate button is clicked
 
-      double newLatitude = _currentPosition!.latitude + _offset;
-      double newLongitude = _currentPosition!.longitude + _offset;
+      double newLatitude = latitude + _offset;
+      double newLongitude = longitude + _offset;
 
       for (String interest in widget.selectedInterests) {
         String keyword = categoryKeywords[interest] ?? "";
         String url =
-            "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=$newLatitude,$newLongitude&radius=20000&keyword=$keyword&key=$googleApiKey";
+            "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=$newLatitude,$newLongitude&radius=10000&keyword=$keyword&key=$googleApiKey";
 
         final response = await http.get(Uri.parse(url));
 
@@ -98,10 +154,9 @@ class _AttractionsScreenState extends State<AttractionsScreen> {
             String placeId = result["place_id"];
             if (!previousSuggestions.contains(placeId)) {
               places.add(result);
-              previousSuggestions
-                  .add(placeId); // Add place_id to avoid repetition
+              previousSuggestions.add(placeId);
             }
-            if (places.length == 3) break; // Limit to one place for now
+            if (places.length == 3) break;
           }
 
           if (places.isNotEmpty) {
@@ -142,6 +197,32 @@ class _AttractionsScreenState extends State<AttractionsScreen> {
     }
   }
 
+   Future<void> _saveTripToFirebase() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      CollectionReference trips = FirebaseFirestore.instance.collection('trips');
+      try {
+        await trips.add({
+          'userId': user.uid,
+          'selectedInterests': widget.selectedInterests,
+          'suggestedPlaces': suggestedPlaces,
+          'timestamp': FieldValue.serverTimestamp(),
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Trip saved successfully!')),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to save trip: $e')),
+        );
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('User not logged in.')),
+      );
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -150,7 +231,12 @@ class _AttractionsScreenState extends State<AttractionsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context)
+            .unfocus(); // Unfocus the input field when tapping outside
+      },
+      child: Scaffold(
         appBar: AppBar(
           title:
               Text('Nearby Attractions', style: TextStyle(color: Colors.white)),
@@ -170,6 +256,64 @@ class _AttractionsScreenState extends State<AttractionsScreen> {
             ? Center(child: CircularProgressIndicator())
             : Column(
                 children: [
+                  Padding(
+                    padding: EdgeInsets.all(12.0),
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: TextField(
+                                controller: locationController,
+                                focusNode: _focusNode,
+                                decoration: InputDecoration(
+                                  labelText: "Enter Location",
+                                  labelStyle: TextStyle(color: Color(0xFF0B5739)),
+                                  border: OutlineInputBorder(),
+                                  focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Color(0xFF0B5739),
+                                    width: 2.0,
+                                  ),
+                                ),
+                                  suffixIcon: Icon(Icons.search),
+                                ),
+                                onChanged: _fetchAutocompleteSuggestions,
+                              ),
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.my_location,
+                                  color: Color(0xFF0B5739)),
+                              onPressed: () {
+                                setState(() {
+                                  inputLatitude = null;
+                                  inputLongitude = null;
+                                });
+                                fetchPlaces();
+                              },
+                            ),
+                          ],
+                        ),
+                        if (_autocompleteResults.isNotEmpty)
+                          Container(
+                            color: Colors.white,
+                            child: Column(
+                              children: _autocompleteResults
+                                  .map((place) => ListTile(
+                                        title: Text(place["description"]),
+                                        onTap: () {
+                                          locationController.text =
+                                              place["description"];
+                                          _convertPlaceIdToCoordinates(
+                                              place["place_id"]);
+                                        },
+                                      ))
+                                  .toList(),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
                   SizedBox(height: 20),
                   Expanded(
                     child: ListView.builder(
@@ -263,8 +407,25 @@ class _AttractionsScreenState extends State<AttractionsScreen> {
                         );
                       },
                     ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
+                    child: ElevatedButton(
+                      onPressed:_saveTripToFirebase,
+                      child: Text('Add Trip'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFF0B5739), // Button color
+                        foregroundColor: Colors.white, // Text color
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)), // Border radius
+                         minimumSize: Size(300, 60),
+                        padding: EdgeInsets.symmetric(vertical: 15.0),
+                        textStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.bold), // Bold text
+                      ),
+                    ),
                   )
                 ],
-              ));
+              ),
+      ),
+    );
   }
 }

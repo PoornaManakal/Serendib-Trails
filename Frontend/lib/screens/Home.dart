@@ -1,10 +1,17 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:serendib_trails/screens/BucketListPage.dart';
+import 'package:serendib_trails/screens/Create_a_plan.dart';
+import 'package:serendib_trails/screens/Explore.dart';
 import 'package:serendib_trails/screens/Login_Screens/SignIn_screen.dart';
+import 'package:serendib_trails/screens/SettingPage/setting.dart';
+import 'package:serendib_trails/screens/map/details.dart';
 import 'package:serendib_trails/screens/map/map_page.dart';
 import 'package:serendib_trails/screens/map/select_interests_screen.dart';
-
+import 'package:serendib_trails/widgets/nav_bar.dart';
+import 'package:serendib_trails/widgets/side_menu.dart';
+import 'package:serendib_trails/screens/Home.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -16,6 +23,15 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   String userName = "User"; // Default value
   User? user = FirebaseAuth.instance.currentUser; // Get the logged-in user
+  int _currentIndex = 0; // Default to Home page
+
+  final List<Widget> _pages = [
+    HomeScreen(),
+    ExplorePage(),
+    SelectInterestsScreen(),
+    BucketListPage(),
+    SettingScreen(),
+  ];
 
   @override
   void initState() {
@@ -42,6 +58,16 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  void _onTap(int index) {
+    setState(() {
+      _currentIndex = index;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => _pages[index]),
+      );
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -60,6 +86,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
+      drawer: SideMenu(),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -101,8 +128,61 @@ class _HomeScreenState extends State<HomeScreen> {
                         builder: (context) => const SigninScreen()));
               },
             ),
+            SizedBox(height: 20),
+            Text(
+              'Saved Trips',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            Expanded(
+              child: user == null
+                  ? Center(child: Text('User not logged in.'))
+                  : StreamBuilder<QuerySnapshot>(
+                      stream: FirebaseFirestore.instance
+                          .collection('trips')
+                          .where('userId', isEqualTo: user!.uid)
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return Center(child: CircularProgressIndicator());
+                        }
+                        if (snapshot.hasError) {
+                          return Center(child: Text('Error: ${snapshot.error}'));
+                        }
+                        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                          return Center(child: Text('No trips found.'));
+                        }
+                        final trips = snapshot.data!.docs;
+                        return ListView.builder(
+                          itemCount: trips.length,
+                          itemBuilder: (context, index) {
+                            final trip = trips[index].data() as Map<String, dynamic>;
+                            return Card(
+                              margin: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                              elevation: 5,
+                              child: ListTile(
+                                title: Text('Trip ${index + 1}'),
+                                subtitle: Text('Interests: ${trip['selectedInterests']?.join(', ') ?? 'No interests available'}'),
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => TripDetailScreen(trip: trip),
+                                    ),
+                                  );
+                                },
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    ),
+            ),
           ],
         ),
+      ),
+      bottomNavigationBar: BottomNavBar(
+        currentIndex: _currentIndex,
+        onTap: _onTap,
       ),
     );
   }

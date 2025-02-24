@@ -1,18 +1,49 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:serendib_trails/screens/Home.dart';
+import 'package:serendib_trails/screens/LandingPage.dart';
+import 'package:serendib_trails/screens/Login_Screens/SignIn_screen.dart';
+//import 'package:serendib_trails/screens/Home/home_scree.dart';
 
-class SplashScreen extends StatelessWidget {
+class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    // Navigate to the welcome page after 3 seconds
-    Timer(const Duration(seconds: 3), () {
-      Navigator.of(context).pushReplacementNamed('/welcome');
-    });
+  State<SplashScreen> createState() => _SplashScreenState();
+}
 
+class _SplashScreenState extends State<SplashScreen> {
+  @override
+  void initState() {
+    super.initState();
+    _navigateToNextScreen();
+  }
+
+  void _navigateToNextScreen() {
+    Timer(const Duration(seconds: 3), () {
+      User? user = FirebaseAuth.instance.currentUser;
+
+      if (user != null) {
+        // User is logged in, go to HomeScreen
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
+        );
+      } else {
+        // User is NOT logged in, go to SignInScreen
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const LandingPage()),
+        );
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0B5739), //  green background
+      backgroundColor: const Color(0xFF0B5739), // Green background
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

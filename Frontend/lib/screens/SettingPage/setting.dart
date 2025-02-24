@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:serendib_trails/screens/BucketListPage.dart';
 import 'package:serendib_trails/screens/Create_a_plan.dart';
 import 'package:serendib_trails/screens/Explore.dart';
@@ -7,6 +9,9 @@ import 'package:serendib_trails/screens/SettingPage/AboutPage.dart';
 import 'package:serendib_trails/screens/SettingPage/AccountPage.dart';
 import 'package:serendib_trails/screens/SettingPage/ProfilePage.dart';
 import 'package:serendib_trails/screens/SettingPage/SettingsPage.dart';
+import 'package:flutter_social_button/flutter_social_button.dart';
+import 'package:serendib_trails/screens/map/select_interests_screen.dart';
+import 'package:serendib_trails/widgets/nav_bar.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class Setting extends StatelessWidget {
@@ -26,15 +31,52 @@ class SettingScreen extends StatefulWidget {
 
 class _SettingScreenState extends State<SettingScreen> {
   int _currentIndex = 4; // Index for bottom navigation
+  User? user;
+  String userName = "";
+  String userEmail = "";
+  String profilePicUrl = "";
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection("users")
+          .doc(user!.uid)
+          .get();
+      if (userDoc.exists) {
+        setState(() {
+          userName = userDoc["name"] ?? "";
+          userEmail = userDoc["email"] ?? "";
+          profilePicUrl = userDoc["profilePic"] ?? "";
+        });
+      }
+    }
+  }
 
   //List of pages for Bottom Navigation
   final List<Widget> _pages = [
     HomeScreen(),
     ExplorePage(),
-    CreateAPlanPage(),
+    SelectInterestsScreen(),
     BucketListPage(),
     SettingScreen(),
   ];
+
+  void _onTap(int index) {
+    setState(() {
+      _currentIndex = index;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => _pages[index]),
+      );
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +89,7 @@ class _SettingScreenState extends State<SettingScreen> {
           onPressed: () {},
         ),
         title: Text(
-          "Home",
+          "Settings",
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
       ),
@@ -58,48 +100,78 @@ class _SettingScreenState extends State<SettingScreen> {
           children: [
             Row(
               children: [
-                CircleAvatar(
+                GestureDetector(
+                   onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => ProfilePage()),
+                    );
+                  },
+                child: CircleAvatar(
                   radius: 30,
-                  backgroundImage: AssetImage('lib/assets/images/porfile.jpg'),
+                  backgroundImage: profilePicUrl.isNotEmpty
+                      ? NetworkImage(profilePicUrl)
+                      : AssetImage('lib/assets/images/default_profile.jpg')
+                          as ImageProvider,
+                ),
                 ),
                 SizedBox(width: 10),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Profile",
-                      style: TextStyle(color: Colors.grey, fontSize: 14),
-                    ),
-                    Text(
-                      "Amal",
+                      userName,
                       style:
                           TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      userEmail,
+                      style: TextStyle(color: Colors.grey, fontSize: 14),
                     ),
                   ],
                 ),
                 Spacer(),
                 IconButton(
-                  icon: Icon(Icons.logout, color: Colors.green),
+                  icon: Icon(Icons.logout, color: Colors.red),
                   onPressed: () {
-                    Navigator.push(
+                    FirebaseAuth.instance.signOut();
+                    Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(builder: (context) => ProfilePage()),
+                      MaterialPageRoute(builder: (context) => HomeScreen()),
                     );
-
-                    // Logout function
                   },
                 ),
               ],
             ),
             SizedBox(height: 30),
-            MenuItem(icon: Icons.person, title: "Profile", page: ProfilePage()),
             MenuItem(
-                icon: Icons.security,
-                title: "Account",
-                page: ResetPasswordPage()),
+              icon: Icons.person,
+              title: "Profile",
+              page: ProfilePage(),
+              iconColor: Color(0xFF0B5739),
+              textColor: Color(0xFF0B5739),
+            ),
             MenuItem(
-                icon: Icons.settings, title: "Settings", page: SettingsPage()),
-            MenuItem(icon: Icons.info, title: "About", page: AboutPage()),
+              icon: Icons.security,
+              title: "Account",
+              page: ResetPasswordPage(),
+              iconColor: Color(0xFF0B5739),
+              textColor: Color(0xFF0B5739),
+            ),
+            MenuItem(
+              icon: Icons.settings,
+              title: "Settings",
+              page: SettingsPage(),
+              iconColor: Color(0xFF0B5739),
+              textColor: Color(0xFF0B5739),
+            ),
+            MenuItem(
+              icon: Icons.info,
+              title: "About",
+              page: AboutPage(),
+              iconColor: Color(0xFF0B5739),
+              textColor: Color(0xFF0B5739),
+            ),
             Spacer(),
             Center(
               child: Column(
@@ -117,19 +189,21 @@ class _SettingScreenState extends State<SettingScreen> {
                     children: [
                       GestureDetector(
                         onTap: () => _launchURL(
-                            "https://www.instagram.com/accounts/login/?hl=en"),
+                            "https://www.instagram.com/serendibtrailsofficial?igsh=M2NrbnY5a2toMGFo"),
                         child: Image.asset('lib/assets/images/ing.png',
                             width: 30, height: 30),
                       ),
                       SizedBox(width: 10),
                       GestureDetector(
-                        onTap: () => _launchURL("https://www.facebook.com"),
+                        onTap: () => _launchURL(
+                            "https://www.facebook.com/share/162tHP81Ey/"),
                         child: Image.asset('lib/assets/images/facebook.png',
                             width: 30, height: 30),
                       ),
                       SizedBox(width: 10),
                       GestureDetector(
-                        onTap: () => _launchURL("https://www.linkedin.com"),
+                        onTap: () => _launchURL(
+                            "https://www.linkedin.com/company/serenedib-trails-lk"),
                         child: Image.asset('lib/assets/images/link.png',
                             width: 30, height: 30),
                       ),
@@ -141,51 +215,16 @@ class _SettingScreenState extends State<SettingScreen> {
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: Colors.green,
-        unselectedItemColor: Colors.black,
-        showSelectedLabels: false,
-        showUnselectedLabels: false,
+      bottomNavigationBar: BottomNavBar(
         currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => _pages[index]),
-            );
-          });
-        },
-        items: [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.compass_calibration_sharp), label: "Profile"),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.add_circle), label: "Account"),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.bookmark_added_sharp), label: "About"),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.settings), label: "Settings"),
-        ],
+        onTap: _onTap,
       ),
     );
   }
 
-//   void _launchURL(String url) async {
-//       final Uri uri = Uri.parse(url);
-//       if (await canLaunchUrl(uri)) {
-//         await launchUrl(uri, mode: LaunchMode.externalApplication);
-//  } else {
-//         throw 'Could not launch $url';
-//       }
-//   }
-
   void _launchURL(String url) async {
     final Uri uri = Uri.parse(url);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    } else {
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
       throw 'Could not launch $url';
     }
   }
@@ -195,14 +234,22 @@ class MenuItem extends StatelessWidget {
   final IconData icon;
   final String title;
   final Widget page;
-
-  MenuItem({required this.icon, required this.title, required this.page});
+  final Color iconColor;
+  final Color textColor;
+  
+  MenuItem({
+    required this.icon,
+    required this.title,
+    required this.page,
+    this.iconColor = Colors.black,
+    this.textColor = Colors.black,
+  });
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: Icon(icon, color: Colors.black),
-      title: Text(title, style: TextStyle(fontSize: 16)),
+      leading: Icon(icon, color: iconColor),
+      title: Text(title, style: TextStyle(fontSize: 16, color: textColor)),
       trailing: Icon(Icons.arrow_forward_ios, size: 16, color: Colors.black),
       onTap: () {
         Navigator.push(context, MaterialPageRoute(builder: (context) => page));

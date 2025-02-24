@@ -56,7 +56,7 @@ class _SelectInterestsScreenState extends State<SelectInterestsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return Scaffold(      
       body: Column(
         children: [
           SizedBox(height: 70),
