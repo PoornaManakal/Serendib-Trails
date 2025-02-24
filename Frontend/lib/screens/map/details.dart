@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:serendib_trails/screens/main_screen.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 final String googleApiKey = dotenv.env['GOOGLE_MAPS_API_KEY'] ?? "";
-
 
 class TripDetailScreen extends StatelessWidget {
   final Map<String, dynamic> trip;
@@ -22,8 +22,8 @@ class TripDetailScreen extends StatelessWidget {
         );
         return false;
       },
-    child: Scaffold(
-      appBar: AppBar(
+      child: Scaffold(
+        appBar: AppBar(
           title: Text(
             "Trip Details",
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
@@ -40,99 +40,120 @@ class TripDetailScreen extends StatelessWidget {
             },
           ),
         ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Selected Interests:',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 10),
-            Text(
-              trip['selectedInterests']?.join(', ') ?? 'No interests available',
-              style: TextStyle(fontSize: 16),
-            ),
-            SizedBox(height: 20),
-            Text(
-              'Suggested Places:',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 10),
-            Expanded(
-              child: suggestedPlaces == null || suggestedPlaces.isEmpty
-                  ? Center(child: Text('No suggested places available'))
-                  : ListView.builder(
-                      itemCount: suggestedPlaces.length,
-                      itemBuilder: (context, index) {
-                        String category = suggestedPlaces.keys.elementAt(index);
-                        List<dynamic> places = suggestedPlaces[category] as List<dynamic>;
-                        return ExpansionTile(
-                          title: Text(category),
-                          children: places.map((place) {
-                            return Card(
-                              margin: EdgeInsets.all(10),
-                              elevation: 5,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  // Display the image (if available)
-                                  place["photos"] != null && place["photos"].isNotEmpty
-                                      ? Image.network(
-                                          "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${place["photos"][0]["photo_reference"]}&key=$googleApiKey",
-                                          fit: BoxFit.cover,
-                                          height: 180,
-                                          width: double.infinity,
-                                        )
-                                      : Container(), // If no image available, display nothing
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Selected Interests:',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 10),
+              Text(
+                trip['selectedInterests']?.join(', ') ?? 'No interests available',
+                style: TextStyle(fontSize: 16),
+              ),
+              SizedBox(height: 20),
+              Text(
+                'Suggested Places:',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 10),
+              Expanded(
+                child: suggestedPlaces == null || suggestedPlaces.isEmpty
+                    ? Center(child: Text('No suggested places available'))
+                    : ListView.builder(
+                        itemCount: suggestedPlaces.length,
+                        itemBuilder: (context, index) {
+                          String category = suggestedPlaces.keys.elementAt(index);
+                          List<dynamic> places = suggestedPlaces[category] as List<dynamic>;
+                          return ExpansionTile(
+                            title: Text(category),
+                            children: places.map((place) {
+                              return GestureDetector(
+                                onTap: () {
+                                  String placeId = place["place_id"];
+                                  String placeName = place["name"];
+                                  _openInGoogleMaps(context, placeName, placeId);
+                                },
+                                child: Card(
+                                  margin: EdgeInsets.all(10),
+                                  elevation: 5,
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      // Display the image (if available)
+                                      place["photos"] != null && place["photos"].isNotEmpty
+                                          ? Image.network(
+                                              "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${place["photos"][0]["photo_reference"]}&key=$googleApiKey",
+                                              fit: BoxFit.cover,
+                                              height: 180,
+                                              width: double.infinity,
+                                            )
+                                          : Container(), // If no image available, display nothing
 
-                                  Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          place["name"] ?? "No name",
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 18,
-                                          ),
-                                        ),
-                                        SizedBox(height: 5),
-                                        Text(
-                                          place["vicinity"] ?? "No address",
-                                          style: TextStyle(fontSize: 14),
-                                        ),
-                                        SizedBox(height: 5),
-                                        Row(
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              "Rating: ",
+                                              place["name"] ?? "No name",
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 18,
+                                              ),
+                                            ),
+                                            SizedBox(height: 5),
+                                            Text(
+                                              place["vicinity"] ?? "No address",
                                               style: TextStyle(fontSize: 14),
                                             ),
-                                            Icon(Icons.star, color: Colors.amber, size: 16),
-                                            Text(
-                                              " ${place["rating"]?.toString() ?? 'N/A'}",
-                                              style: TextStyle(fontSize: 14),
+                                            SizedBox(height: 5),
+                                            Row(
+                                              children: [
+                                                Text(
+                                                  "Rating: ",
+                                                  style: TextStyle(fontSize: 14),
+                                                ),
+                                                Icon(Icons.star, color: Colors.amber, size: 16),
+                                                Text(
+                                                  " ${place["rating"]?.toString() ?? 'N/A'}",
+                                                  style: TextStyle(fontSize: 14),
+                                                ),
+                                              ],
                                             ),
                                           ],
                                         ),
-                                      ],
-                                    ),
+                                      ),
+                                    ],
                                   ),
-                                ],
-                              ),
-                            );
-                          }).toList(),
-                        );
-                      },
-                    ),
-            ),
-          ],
+                                ),
+                              );
+                            }).toList(),
+                          );
+                        },
+                      ),
+              ),
+            ],
+          ),
         ),
       ),
-    ),
     );
+  }
+
+  void _openInGoogleMaps(BuildContext context, String placeName, String placeId) async {
+    String encodedPlaceName = Uri.encodeComponent(placeName);
+    String googleMapsUrl =
+        "https://www.google.com/maps/search/?api=1&query=$encodedPlaceName&query_place_id=$placeId";
+
+    if (await canLaunchUrl(Uri.parse(googleMapsUrl))) {
+      await launchUrl(Uri.parse(googleMapsUrl));
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Could not open Google Maps.')),
+      );
+    }
   }
 }

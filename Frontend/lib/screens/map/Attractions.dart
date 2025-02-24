@@ -106,7 +106,7 @@ class _AttractionsScreenState extends State<AttractionsScreen> {
           inputLatitude = data["results"][0]["geometry"]["location"]["lat"];
           inputLongitude = data["results"][0]["geometry"]["location"]["lng"];
           _autocompleteResults = []; // Clear suggestions after selection
-          locationController.clear(); // Clear input field after selection
+          //locationController.clear(); // Clear input field after selection
         });
         fetchPlaces(); // Fetch attractions after getting new coordinates
       }
