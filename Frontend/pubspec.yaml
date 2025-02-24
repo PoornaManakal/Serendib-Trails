@@ -58,6 +58,9 @@ dev_dependencies:
   http: ^1.3.0
   flutter_dotenv: ^5.2.1
   url_launcher: ^6.3.1
+  flutter_social_button: ^1.1.6+1
+  firebase_storage: ^12.4.3
+  image_picker: ^1.1.2
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -76,6 +79,7 @@ flutter:
     - lib/assets/images/landing1.jpg
     - lib/assets/images/landing2.jpg
     - lib/assets/images/landing3.jpg
+    - lib/assets/images/
     - assets/ 
     - .env
 
