@@ -5,6 +5,7 @@ import 'package:serendib_trails/screens/BucketListPage.dart';
 import 'package:serendib_trails/screens/Create_a_plan.dart';
 import 'package:serendib_trails/screens/Explore.dart';
 import 'package:serendib_trails/screens/Home.dart';
+import 'package:serendib_trails/screens/Login_Screens/SignIn_screen.dart';
 import 'package:serendib_trails/screens/SettingPage/AboutPage.dart';
 import 'package:serendib_trails/screens/SettingPage/AccountPage.dart';
 import 'package:serendib_trails/screens/SettingPage/ProfilePage.dart';
@@ -137,7 +138,7 @@ class _SettingScreenState extends State<SettingScreen> {
                     FirebaseAuth.instance.signOut();
                     Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(builder: (context) => HomeScreen()),
+                      MaterialPageRoute(builder: (context) => SigninScreen()),
                     );
                   },
                 ),
