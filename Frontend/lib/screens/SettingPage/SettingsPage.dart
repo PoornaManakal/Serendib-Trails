@@ -20,23 +20,26 @@ class _SettingsPageState extends State<SettingsPage> {
   int _currentIndex = 4; // Initial index for the BottomNavigationBar
 
   // List of pages for Bottom Navigation
-  final List<Widget> _pages = [
-    HomeScreen(),
-    ExplorePage(),
-    CreateAPlanPage(),
-    BucketListPage(),
-    SettingScreen(),
-  ];
+  
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Settings"),
+        backgroundColor: Color(0xFF0B5739),
+        elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Navigator.pop(context);
+          },
         ),
+        title: Text("Settings",
+            style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.white)),
+        centerTitle: false,
       ),
       body: ListView(
         padding: EdgeInsets.all(16),
@@ -87,33 +90,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: Colors.green,
-        unselectedItemColor: Colors.black,
-        showSelectedLabels: false,
-        showUnselectedLabels: false,
-        currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => _pages[index]),
-            );
-          });
-        },
-        items: [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.navigate_next_rounded), label: "Profile"),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.add_circle), label: "Account"),
-          BottomNavigationBarItem(icon: Icon(Icons.bookmark), label: "About"),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.settings), label: "Settings"),
-        ],
-      ),
+      
     );
   }
 }
