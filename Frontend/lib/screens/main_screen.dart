@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:serendib_trails/screens/Accomodations/Accomodations.dart';
 import 'package:serendib_trails/screens/BucketListPage.dart';
 import 'package:serendib_trails/screens/Explore.dart';
 import 'package:serendib_trails/screens/Home.dart';
 import 'package:serendib_trails/screens/SettingPage/setting.dart';
-import 'package:serendib_trails/screens/map/select_interests_screen.dart';
+import 'package:serendib_trails/screens/Attractions/select_interests_screen.dart';
 import 'package:serendib_trails/widgets/nav_bar.dart';
 
 class MainScreen extends StatefulWidget {
@@ -26,7 +27,7 @@ class _MainScreenState extends State<MainScreen> {
 
   final List<Widget> _pages = [
     HomeScreen(),
-    ExplorePage(),
+    AccommodationPage(),
     SelectInterestsScreen(),
     BucketListPage(),
     SettingScreen(),
