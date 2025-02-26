@@ -1,10 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:serendib_trails/screens/Explore.dart';
 import 'package:serendib_trails/screens/Login_Screens/SignIn_screen.dart';
 import 'package:serendib_trails/screens/SettingPage/ProfilePage.dart';
 import 'package:serendib_trails/screens/main_screen.dart';
-import 'package:serendib_trails/screens/map/map_page.dart';
+import 'package:serendib_trails/screens/Attractions/map_page.dart';
 
 class SideMenu extends StatefulWidget {
   @override
@@ -109,7 +110,8 @@ class _SideMenuState extends State<SideMenu> {
                     leading: Icon(Icons.bookmark, color: Color(0xFF0B5739)),
                     title: Text("Favourites", style: TextStyle(color: Color(0xFF0B5739))),
                     onTap: () {
-                      navigateToPage(1);
+                      //navigateToPage(1);
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => ExplorePage()));
                     },
                   ),
                   ListTile(

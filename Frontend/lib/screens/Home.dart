@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:serendib_trails/screens/Login_Screens/SignIn_screen.dart';
-import 'package:serendib_trails/screens/map/details.dart';
+import 'package:serendib_trails/screens/Attractions/details.dart';
 import 'package:serendib_trails/widgets/side_menu.dart';
 
 class HomeScreen extends StatefulWidget {

@@ -5,7 +5,7 @@ import 'package:serendib_trails/screens/Login_Screens/ResetPassword_screen.dart'
 import 'package:serendib_trails/screens/Login_Screens/SignIn_screen.dart';
 import 'package:serendib_trails/screens/Login_Screens/SignUp_screen.dart';
 import 'package:serendib_trails/screens/main_screen.dart';
-import 'package:serendib_trails/screens/map/select_interests_screen.dart';
+import 'package:serendib_trails/screens/Attractions/select_interests_screen.dart';
 import 'screens/welcomepage.dart';
 import 'screens/splashscreen.dart';
 import 'package:firebase_core/firebase_core.dart';

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:serendib_trails/screens/main_screen.dart';
-import 'package:serendib_trails/screens/map/Attractions.dart';
+import 'package:serendib_trails/screens/Attractions/Attractions.dart';
 
 class SelectInterestsScreen extends StatefulWidget {
   @override
