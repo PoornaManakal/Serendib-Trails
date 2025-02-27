@@ -6,6 +6,7 @@ class AboutPage extends StatefulWidget {
 }
 
 class _AboutPageState extends State<AboutPage> {
+
   final List<TeamMember> teamMembers = [
     TeamMember(
         name: "Chamod Pankaja",
@@ -33,15 +34,25 @@ class _AboutPageState extends State<AboutPage> {
         imagePath: "lib/assets/images/Kavindu.jpg"),
   ];
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("About"),
+     appBar: AppBar(
+        backgroundColor: Color(0xFF0B5739),
+        elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Navigator.pop(context);
+          },
         ),
+        title: Text("About",
+            style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.white)),
+        centerTitle: false,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -52,7 +63,7 @@ class _AboutPageState extends State<AboutPage> {
               Text(
                 "About Us",
                 style: TextStyle(
-                  color: Colors.green,
+                  color: Color(0xFF0B5739),
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
@@ -62,13 +73,13 @@ class _AboutPageState extends State<AboutPage> {
                 "At Serendib Trails, we aim to redefine your travel experience in Sri Lanka. "
                 "Whether you're drawn to the serene beaches, lush hill-country, or rich cultural heritage, "
                 "we create tailored itineraries that align with your interests and preferences.",
-                style: TextStyle(fontSize: 16, color: Colors.green),
+                style: TextStyle(fontSize: 16, color: Colors.black),
               ),
               SizedBox(height: 10),
               Text(
                 "Our mission is to help you discover the beauty of Sri Lanka seamlessly, "
                 "with features like interactive maps, AR landmarks, transportation tips, and budget breakdowns – all in one place.",
-                style: TextStyle(fontSize: 16, color: Colors.green),
+                style: TextStyle(fontSize: 16, color: Colors.black),
               ),
               SizedBox(height: 20),
               Text(
@@ -76,7 +87,7 @@ class _AboutPageState extends State<AboutPage> {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: Colors.green,
+                  color: Color(0xFF0B5739),
                 ),
               ),
               SizedBox(height: 10),
@@ -101,8 +112,13 @@ class _AboutPageState extends State<AboutPage> {
                   "Team Serendib Trails",
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
+
                     fontSize: 18,
                     color: Colors.green,
+
+                    fontSize: 16,
+                    color: Color(0xFF0B5739),
+
                   ),
                 ),
               ),
@@ -125,6 +141,7 @@ class _AboutPageState extends State<AboutPage> {
           ),
         ),
       ),
+
     );
   }
 
@@ -139,7 +156,7 @@ class _AboutPageState extends State<AboutPage> {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: Colors.green,
+              color: Color(0xFF0B5739),
             ),
           ),
           Expanded(

@@ -1,17 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:serendib_trails/screens/BucketListPage.dart';
-import 'package:serendib_trails/screens/Create_a_plan.dart';
-import 'package:serendib_trails/screens/Explore.dart';
 import 'package:serendib_trails/screens/Login_Screens/SignIn_screen.dart';
-import 'package:serendib_trails/screens/SettingPage/setting.dart';
-import 'package:serendib_trails/screens/map/details.dart';
-import 'package:serendib_trails/screens/map/map_page.dart';
-import 'package:serendib_trails/screens/map/select_interests_screen.dart';
-import 'package:serendib_trails/widgets/nav_bar.dart';
+import 'package:serendib_trails/screens/Attractions/details.dart';
 import 'package:serendib_trails/widgets/side_menu.dart';
-import 'package:serendib_trails/screens/Home.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -23,15 +15,6 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   String userName = "User"; // Default value
   User? user = FirebaseAuth.instance.currentUser; // Get the logged-in user
-  int _currentIndex = 0; // Default to Home page
-
-  final List<Widget> _pages = [
-    HomeScreen(),
-    ExplorePage(),
-    SelectInterestsScreen(),
-    BucketListPage(),
-    SettingScreen(),
-  ];
 
   @override
   void initState() {
@@ -58,24 +41,16 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  void _onTap(int index) {
-    setState(() {
-      _currentIndex = index;
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => _pages[index]),
-      );
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Welcome, $userName!"), // Display user's name
+        title: Text("Welcome, $userName!", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)), // Display user's name
+        backgroundColor: const Color(0xFF0B5739), // Green color
+        iconTheme: IconThemeData(color: Colors.white),
         actions: [
           IconButton(
-            icon: Icon(Icons.logout),
+            icon: Icon(Icons.logout, color: Colors.white),
             onPressed: () async {
               await FirebaseAuth.instance.signOut(); // Sign out the user
               Navigator.pushReplacement(
@@ -91,43 +66,10 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              "Hello, $userName!",
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              child: Text("Click me"),
-              onPressed: () {
-                // Add button press logic here
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => SelectInterestsScreen()),
-                );
-              },
-            ),
-            ElevatedButton(
-              child: Text("Map"),
-              onPressed: () {
-                // Add button press logic here
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => MapPage()),
-                );
-              },
-            ),
-            ElevatedButton(
-              child: Text("Logout"),
-              onPressed: () async {
-                await FirebaseAuth.instance.signOut(); // Sign out the user
-                Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const SigninScreen()));
-              },
-            ),
+            // Text(
+            //   "Hello, $userName!",
+            //   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            // ),
             SizedBox(height: 20),
             Text(
               'Saved Trips',
@@ -179,10 +121,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ],
         ),
-      ),
-      bottomNavigationBar: BottomNavBar(
-        currentIndex: _currentIndex,
-        onTap: _onTap,
       ),
     );
   }

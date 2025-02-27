@@ -37,7 +37,7 @@ class _SigninScreenState extends State<SigninScreen> {
         _emailController.clear();
         _passwordController.clear();
         // Navigate to home screen or dashboard after successful login
-        Navigator.pushReplacementNamed(context, '/home');
+        Navigator.pushReplacementNamed(context,'/main');
 
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
