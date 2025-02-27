@@ -19,7 +19,7 @@ class _AboutPageState extends State<AboutPage> {
     TeamMember(
         name: "Poorna Manakal",
         role: "Backend Sub Developer",
-        imagePath: "lib/assets/images/poorna.jpg"),
+        imagePath: "lib/assets/images/Poorna.jpg"),
     TeamMember(
         name: "S.Abiram",
         role: "Sub AR Developer",
@@ -113,9 +113,7 @@ class _AboutPageState extends State<AboutPage> {
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
 
-                    fontSize: 18,
-                    color: Colors.green,
-
+                  
                     fontSize: 16,
                     color: Color(0xFF0B5739),
 
