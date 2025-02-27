@@ -187,16 +187,16 @@ class TeamMemberWidget extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
             child: Image.asset(
               teamMember.imagePath,
-              width: 120,
-              height: 120,
+              width: 90,
+              height: 90,
               fit: BoxFit.cover,
             ),
           ),
         ),
-        SizedBox(height: 8),
+        SizedBox(height: 6),
         Container(
           padding: EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-          width: 180,
+          width: 120,
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(6),
@@ -214,7 +214,7 @@ class TeamMemberWidget extends StatelessWidget {
                 teamMember.name,
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: 10,
                   fontWeight: FontWeight.bold,
                   color: Colors.black,
                 ),
@@ -223,7 +223,7 @@ class TeamMemberWidget extends StatelessWidget {
                 teamMember.role,
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 12,
+                  fontSize: 08,
                   color: Colors.grey[700],
                 ),
               ),
