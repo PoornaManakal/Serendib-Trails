@@ -4,7 +4,6 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:geolocator/geolocator.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'dart:math';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -107,7 +106,7 @@ class _AttractionsScreenState extends State<AttractionsScreen> {
           inputLatitude = data["results"][0]["geometry"]["location"]["lat"];
           inputLongitude = data["results"][0]["geometry"]["location"]["lng"];
           _autocompleteResults = []; // Clear suggestions after selection
-          locationController.clear(); // Clear input field after selection
+          //locationController.clear(); // Clear input field after selection
         });
         fetchPlaces(); // Fetch attractions after getting new coordinates
       }
@@ -197,10 +196,11 @@ class _AttractionsScreenState extends State<AttractionsScreen> {
     }
   }
 
-   Future<void> _saveTripToFirebase() async {
+  Future<void> _saveTripToFirebase() async {
     User? user = FirebaseAuth.instance.currentUser;
     if (user != null) {
-      CollectionReference trips = FirebaseFirestore.instance.collection('trips');
+      CollectionReference trips =
+          FirebaseFirestore.instance.collection('trips');
       try {
         await trips.add({
           'userId': user.uid,
@@ -238,9 +238,17 @@ class _AttractionsScreenState extends State<AttractionsScreen> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title:
-              Text('Nearby Attractions', style: TextStyle(color: Colors.white)),
+          title: Text('Nearby Attractions',
+              style:
+                  TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
           backgroundColor: Color(0xFF0B5739),
+          elevation: 0,
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () {
+              Navigator.pop(context); // Go back to the previous screen
+            },
+          ),
           actions: [
             IconButton(
               icon: Icon(Icons.refresh, color: Colors.white),
@@ -268,14 +276,15 @@ class _AttractionsScreenState extends State<AttractionsScreen> {
                                 focusNode: _focusNode,
                                 decoration: InputDecoration(
                                   labelText: "Enter Location",
-                                  labelStyle: TextStyle(color: Color(0xFF0B5739)),
+                                  labelStyle:
+                                      TextStyle(color: Color(0xFF0B5739)),
                                   border: OutlineInputBorder(),
                                   focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: Color(0xFF0B5739),
-                                    width: 2.0,
+                                    borderSide: BorderSide(
+                                      color: Color(0xFF0B5739),
+                                      width: 2.0,
+                                    ),
                                   ),
-                                ),
                                   suffixIcon: Icon(Icons.search),
                                 ),
                                 onChanged: _fetchAutocompleteSuggestions,
@@ -411,15 +420,19 @@ class _AttractionsScreenState extends State<AttractionsScreen> {
                   Padding(
                     padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
                     child: ElevatedButton(
-                      onPressed:_saveTripToFirebase,
+                      onPressed: _saveTripToFirebase,
                       child: Text('Add Trip'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Color(0xFF0B5739), // Button color
                         foregroundColor: Colors.white, // Text color
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)), // Border radius
-                         minimumSize: Size(300, 60),
+                        shape: RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.circular(30)), // Border radius
+                        minimumSize: Size(300, 60),
                         padding: EdgeInsets.symmetric(vertical: 15.0),
-                        textStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.bold), // Bold text
+                        textStyle: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold), // Bold text
                       ),
                     ),
                   )

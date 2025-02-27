@@ -1,11 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:serendib_trails/screens/BucketListPage.dart';
-import 'package:serendib_trails/screens/Create_a_plan.dart';
-import 'package:serendib_trails/screens/Explore.dart';
-import 'package:serendib_trails/screens/Home.dart';
-import 'package:serendib_trails/screens/SettingPage/setting.dart';
-import 'package:serendib_trails/widgets/nav_bar.dart';
 
 class UpdatePasswordPage extends StatefulWidget {
   @override
@@ -21,24 +15,9 @@ class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
   final _confirmPasswordController = TextEditingController();
 
   // List of pages for Bottom Navigation
-  final List<Widget> _pages = [
-    HomeScreen(),
-    ExplorePage(),
-    CreateAPlanPage(),
-    BucketListPage(),
-    SettingScreen(),
-  ];
+  
 
-  void _onTap(int index) {
-    setState(() {
-      _currentIndex = index;
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => _pages[index]),
-      );
-    });
-  }
-
+  
   Future<void> _updatePassword() async {
     if (_formKey.currentState!.validate()) {
       try {
@@ -76,15 +55,15 @@ class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Color(0xFF0B5739),
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
+          icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          "Settings",
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          "Update Password",
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
       ),
       body: Padding(
@@ -135,10 +114,7 @@ class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
           ),
         ),
       ),
-      bottomNavigationBar: BottomNavBar(
-        currentIndex: _currentIndex,
-        onTap: _onTap,
-      ),
+      
     );
   }
 

@@ -61,7 +61,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
         // Navigate to the next screen after successful signup
         Navigator.pushReplacementNamed(
-            context, '/home'); // Change this to your desired route
+            context, '/main'); // Change this to your desired route
       } on FirebaseAuthException catch (e) {
         // Handle errors
         ScaffoldMessenger.of(context).showSnackBar(

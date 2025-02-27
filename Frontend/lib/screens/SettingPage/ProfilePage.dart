@@ -139,10 +139,10 @@ class _ProfilePageState extends State<ProfilePage> {
     return Scaffold(
       //backgroundColor: Color(0xFFFDF6F4),
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: Color(0xFF0B5739),
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
+          icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -151,7 +151,7 @@ class _ProfilePageState extends State<ProfilePage> {
             style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: Colors.black)),
+                color: Colors.white)),
         centerTitle: false,
       ),
       body: SingleChildScrollView(
