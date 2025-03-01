@@ -75,6 +75,7 @@ class _HomeScreenState extends State<HomeScreen>
                       children : model3dlist.map((each3dItem)
                         {
                           return Card(
+                            elevation: 0,
                             child: Container(
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(19),
@@ -82,16 +83,44 @@ class _HomeScreenState extends State<HomeScreen>
                                   image: NetworkImage(each3dItem["photoUrl"]),
                                   fit: BoxFit.cover,
                                 ),
+                              ),
 
+                              child : Transform.translate(
+                                  offset: const Offset(0, 60),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(9),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+
+                                        SizedBox(
+                                          width: 55,
+                                          child: Center(
+                                            child: ElevatedButton(
+                                              onPressed: (){},
+                                              style: ElevatedButton.styleFrom(
+                                                padding: EdgeInsets.all(0),
+                                                backgroundColor: Colors.white,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.circular(17),
+                                                ),
+                                              ),
+                                              child: const Icon(
+                                                Icons.add_circle,
+                                                color: Colors.black,
+                                              ),
+                        ),
+                                        ),
+                        ),
+                                      ],
+                          )
+                                  )
                               ),
                             ),
                           );
                         }).toList(),
                     )
-
-
                 )],
-
             ),
           )
     ),
