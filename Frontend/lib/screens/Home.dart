@@ -4,6 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:serendib_trails/screens/Login_Screens/SignIn_screen.dart';
 import 'package:serendib_trails/screens/Attractions/details.dart';
 import 'package:serendib_trails/widgets/side_menu.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
+final String googleApiKey = dotenv.env['GOOGLE_MAPS_API_KEY'] ?? "";
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -12,14 +17,16 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
   String userName = "User"; // Default value
   User? user = FirebaseAuth.instance.currentUser; // Get the logged-in user
+  late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
     fetchUserData();
+    _tabController = TabController(length: 3, vsync: this);
   }
 
   Future<void> fetchUserData() async {
@@ -42,6 +49,12 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -60,67 +73,191 @@ class _HomeScreenState extends State<HomeScreen> {
             },
           ),
         ],
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(kToolbarHeight),
+          child: Container(
+            color: Color(0xFFFEF7FF), // Background color of the TabBar
+            child: TabBar(
+              controller: _tabController,
+              indicator: UnderlineTabIndicator(
+                borderSide: BorderSide(width: 4.0, color: Color(0xFF0B5739)), // Customize the underline color and thickness
+                insets: EdgeInsets.symmetric(horizontal: 16.0), // Customize the horizontal padding of the underline
+              ),
+              labelColor: Color(0xFF0B5739), // Color of the selected tab label
+              unselectedLabelColor: Colors.grey, // Color of the unselected tab label
+              tabs: [
+                Tab(text: "Ongoing Trips"),
+                Tab(text: "Upcoming Trips"),
+                Tab(text: "Past Trips"),
+              ],
+            ),
+          ),
+        ),
       ),
       drawer: SideMenu(),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Text(
-            //   "Hello, $userName!",
-            //   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            // ),
-            SizedBox(height: 20),
-            Text(
-              'Saved Trips',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            Expanded(
-              child: user == null
-                  ? Center(child: Text('User not logged in.'))
-                  : StreamBuilder<QuerySnapshot>(
-                      stream: FirebaseFirestore.instance
-                          .collection('trips')
-                          .where('userId', isEqualTo: user!.uid)
-                          .snapshots(),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                          return Center(child: CircularProgressIndicator());
-                        }
-                        if (snapshot.hasError) {
-                          return Center(child: Text('Error: ${snapshot.error}'));
-                        }
-                        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                          return Center(child: Text('No trips found.'));
-                        }
-                        final trips = snapshot.data!.docs;
-                        return ListView.builder(
-                          itemCount: trips.length,
-                          itemBuilder: (context, index) {
-                            final trip = trips[index].data() as Map<String, dynamic>;
-                            return Card(
-                              margin: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-                              elevation: 5,
-                              child: ListTile(
-                                title: Text('Trip ${index + 1}'),
-                                subtitle: Text('Interests: ${trip['selectedInterests']?.join(', ') ?? 'No interests available'}'),
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => TripDetailScreen(trip: trip),
+      body: TabBarView(
+        controller: _tabController,
+        children: [
+          TripsList(user: user, tripType: 'ongoing'),
+          TripsList(user: user, tripType: 'upcoming'),
+          TripsList(user: user, tripType: 'completed'),
+        ],
+      ),
+    );
+  }
+}
+
+class TripsList extends StatelessWidget {
+  final User? user;
+  final String tripType;
+
+  const TripsList({required this.user, required this.tripType});
+
+  Future<void> _updateTripType(String tripId, String newTripType) async {
+    await FirebaseFirestore.instance.collection('trips').doc(tripId).update({
+      'tripType': newTripType,
+    });
+  }
+
+  Future<void> _deleteTrip(String tripId) async {
+    await FirebaseFirestore.instance.collection('trips').doc(tripId).delete();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SizedBox(height: 20),
+          // Text(
+          //   'Saved Trips',
+          //   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          // ),
+          Expanded(
+            child: user == null
+                ? Center(child: Text('User not logged in.'))
+                : StreamBuilder<QuerySnapshot>(
+                    stream: FirebaseFirestore.instance
+                        .collection('trips')
+                        .where('userId', isEqualTo: user!.uid)
+                        .where('tripType', isEqualTo: tripType)
+                        .snapshots(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(child: CircularProgressIndicator());
+                      }
+                      if (snapshot.hasError) {
+                        return Center(child: Text('Error: ${snapshot.error}'));
+                      }
+                      if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                        return Center(child: Text('No trips found.'));
+                      }
+                      final trips = snapshot.data!.docs;
+                      return ListView.builder(
+                        itemCount: trips.length,
+                        itemBuilder: (context, index) {
+                          final trip = trips[index].data() as Map<String, dynamic>;
+                          final tripId = trips[index].id;
+                          final photoUrl = trip['photoUrl'] as String?;
+                          return Card(
+                            margin: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                            elevation: 5,
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => TripDetailScreen(trip: trip),
+                                  ),
+                                );
+                              },
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Display the image (if available)
+                                  photoUrl != null
+                                      ? Image.network(
+                                          photoUrl,
+                                          fit: BoxFit.cover,
+                                          height: 180,
+                                          width: double.infinity,
+                                        )
+                                      : Container(), // If no image available, display nothing
+
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          trip['cityName'] ?? "No name",
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 18,
+                                          ),
+                                        ),
+                                        SizedBox(height: 5),
+                                        Text(
+                                          'Interests: ${trip['selectedInterests']?.join(', ') ?? 'No interests available'}',
+                                          style: TextStyle(fontSize: 14),
+                                        ),
+                                        SizedBox(height: 5),
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            ElevatedButton(
+                                              onPressed: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) => TripDetailScreen(trip: trip),
+                                                  ),
+                                                );
+                                              },
+                                              child: Text('View Details'),
+                                            ),
+                                            IconButton(
+                                              icon: Icon(Icons.bookmark_border),
+                                              onPressed: () {
+                                                // Handle bookmark action
+                                              },
+                                            ),
+                                            IconButton(
+                                              icon: Icon(Icons.delete),
+                                              onPressed: () {
+                                                _deleteTrip(tripId);
+                                              },
+                                            ),
+                                          ],
+                                        ),
+                                        if (tripType == 'upcoming')
+                                          ElevatedButton(
+                                            onPressed: () {
+                                              _updateTripType(tripId, 'ongoing');
+                                            },
+                                            child: Text('Start Trip'),
+                                          ),
+                                        if (tripType == 'ongoing')
+                                          ElevatedButton(
+                                            onPressed: () {
+                                              _updateTripType(tripId, 'completed');
+                                            },
+                                            child: Text('Complete Trip'),
+                                          ),
+                                      ],
                                     ),
-                                  );
-                                },
+                                  ),
+                                ],
                               ),
-                            );
-                          },
-                        );
-                      },
-                    ),
-            ),
-          ],
-        ),
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ),
+          ),
+        ],
       ),
     );
   }

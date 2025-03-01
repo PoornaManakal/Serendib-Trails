@@ -113,6 +113,24 @@ class _AttractionsScreenState extends State<AttractionsScreen> {
     }
   }
 
+  Future<String?> _getCityNameFromCoordinates(double latitude, double longitude) async {
+    String url =
+        "https://maps.googleapis.com/maps/api/geocode/json?latlng=$latitude,$longitude&key=$googleApiKey";
+
+    final response = await http.get(Uri.parse(url));
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      if (data["results"].isNotEmpty) {
+        for (var component in data["results"][0]["address_components"]) {
+          if (component["types"].contains("locality")) {
+            return component["long_name"];
+          }
+        }
+      }
+    }
+    return null;
+  }
+
   String? _pageToken;
   double _offset = 0;
 
@@ -197,32 +215,47 @@ class _AttractionsScreenState extends State<AttractionsScreen> {
   }
 
   Future<void> _saveTripToFirebase() async {
-    User? user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      CollectionReference trips =
-          FirebaseFirestore.instance.collection('trips');
-      try {
-        await trips.add({
-          'userId': user.uid,
-          'selectedInterests': widget.selectedInterests,
-          'suggestedPlaces': suggestedPlaces,
-          'timestamp': FieldValue.serverTimestamp(),
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Trip saved successfully!')),
-        );
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to save trip: $e')),
-        );
+  User? user = FirebaseAuth.instance.currentUser;
+  if (user != null) {
+    CollectionReference trips = FirebaseFirestore.instance.collection('trips');
+    try {
+      String? cityName = locationController.text.isNotEmpty
+          ? locationController.text
+          : await _getCityNameFromCoordinates(
+              _currentPosition!.latitude, _currentPosition!.longitude);
+
+      // Get the first photo URL from the suggested places
+      String? photoUrl;
+      for (var places in suggestedPlaces.values) {
+        if (places.isNotEmpty && places[0]["photos"] != null && places[0]["photos"].isNotEmpty) {
+          photoUrl = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${places[0]["photos"][0]["photo_reference"]}&key=$googleApiKey";
+          break;
+        }
       }
-    } else {
+
+      await trips.add({
+        'userId': user.uid,
+        'selectedInterests': widget.selectedInterests,
+        'suggestedPlaces': suggestedPlaces,
+        'tripType': 'upcoming',
+        'timestamp': FieldValue.serverTimestamp(),
+        'cityName': cityName ?? 'Unknown City', // Save the city name
+        'photoUrl': photoUrl, // Save the photo URL
+      });
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('User not logged in.')),
+        SnackBar(content: Text('Trip saved successfully!')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to save trip: $e')),
       );
     }
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('User not logged in.')),
+    );
   }
-
+}
   @override
   void initState() {
     super.initState();
