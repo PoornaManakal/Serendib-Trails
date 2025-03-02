@@ -43,7 +43,7 @@ class _AttractionsScreenState extends State<AttractionsScreen> {
     "Spiritual Journeys": "temple|monastery|church|mosque",
     "Historical Tours": "historical site|monument|archaeological site",
     "Wildlife Safari": "national park|wildlife sanctuary|animal reserve",
-    "Traditional Arts & Crafts": "handicraft market|artisan workshop"
+    "Traditional Arts & Crafts": "handicraft market|artisan workshop",
   };
 
   Future<void> _getCurrentPosition() async {
@@ -106,14 +106,15 @@ class _AttractionsScreenState extends State<AttractionsScreen> {
           inputLatitude = data["results"][0]["geometry"]["location"]["lat"];
           inputLongitude = data["results"][0]["geometry"]["location"]["lng"];
           _autocompleteResults = []; // Clear suggestions after selection
-          //locationController.clear(); // Clear input field after selection
+          locationController.clear(); // Clear input field after selection
         });
         fetchPlaces(); // Fetch attractions after getting new coordinates
       }
     }
   }
 
-  Future<String?> _getCityNameFromCoordinates(double latitude, double longitude) async {
+  Future<String?> _getCityNameFromCoordinates(
+      double latitude, double longitude) async {
     String url =
         "https://maps.googleapis.com/maps/api/geocode/json?latlng=$latitude,$longitude&key=$googleApiKey";
 
@@ -215,47 +216,52 @@ class _AttractionsScreenState extends State<AttractionsScreen> {
   }
 
   Future<void> _saveTripToFirebase() async {
-  User? user = FirebaseAuth.instance.currentUser;
-  if (user != null) {
-    CollectionReference trips = FirebaseFirestore.instance.collection('trips');
-    try {
-      String? cityName = locationController.text.isNotEmpty
-          ? locationController.text
-          : await _getCityNameFromCoordinates(
-              _currentPosition!.latitude, _currentPosition!.longitude);
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      CollectionReference trips =
+          FirebaseFirestore.instance.collection('trips');
+      try {
+        String? cityName = locationController.text.isNotEmpty
+            ? locationController.text
+            : await _getCityNameFromCoordinates(
+                _currentPosition!.latitude, _currentPosition!.longitude);
 
-      // Get the first photo URL from the suggested places
-      String? photoUrl;
-      for (var places in suggestedPlaces.values) {
-        if (places.isNotEmpty && places[0]["photos"] != null && places[0]["photos"].isNotEmpty) {
-          photoUrl = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${places[0]["photos"][0]["photo_reference"]}&key=$googleApiKey";
-          break;
+        // Get the first photo URL from the suggested places
+        String? photoUrl;
+        for (var places in suggestedPlaces.values) {
+          if (places.isNotEmpty &&
+              places[0]["photos"] != null &&
+              places[0]["photos"].isNotEmpty) {
+            photoUrl =
+                "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${places[0]["photos"][0]["photo_reference"]}&key=$googleApiKey";
+            break;
+          }
         }
-      }
 
-      await trips.add({
-        'userId': user.uid,
-        'selectedInterests': widget.selectedInterests,
-        'suggestedPlaces': suggestedPlaces,
-        'tripType': 'upcoming',
-        'timestamp': FieldValue.serverTimestamp(),
-        'cityName': cityName ?? 'Unknown City', // Save the city name
-        'photoUrl': photoUrl, // Save the photo URL
-      });
+        await trips.add({
+          'userId': user.uid,
+          'selectedInterests': widget.selectedInterests,
+          'suggestedPlaces': suggestedPlaces,
+          'tripType': 'upcoming',
+          'timestamp': FieldValue.serverTimestamp(),
+          'cityName': cityName ?? 'Unknown City', // Save the city name
+          'photoUrl': photoUrl, // Save the photo URL
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Trip saved successfully!')),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to save trip: $e')),
+        );
+      }
+    } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Trip saved successfully!')),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to save trip: $e')),
+        SnackBar(content: Text('User not logged in.')),
       );
     }
-  } else {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('User not logged in.')),
-    );
   }
-}
+
   @override
   void initState() {
     super.initState();
