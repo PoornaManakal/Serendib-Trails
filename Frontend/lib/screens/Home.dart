@@ -164,14 +164,6 @@ class TripsList extends StatelessWidget {
                             margin: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
                             elevation: 5,
                             child: GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => TripDetailScreen(trip: trip),
-                                  ),
-                                );
-                              },
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
