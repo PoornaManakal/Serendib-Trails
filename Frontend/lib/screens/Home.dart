@@ -351,3 +351,5 @@ class TripsList extends StatelessWidget {
     );
   }
 }
+
+// bookmark section should be implemented
