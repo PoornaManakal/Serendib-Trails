@@ -164,27 +164,54 @@ class TripsList extends StatelessWidget {
                             margin: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
                             elevation: 5,
                             child: GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => TripDetailScreen(trip: trip),
-                                  ),
-                                );
-                              },
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  // Display the image (if available)
-                                  photoUrl != null
-                                      ? Image.network(
-                                          photoUrl,
-                                          fit: BoxFit.cover,
-                                          height: 180,
-                                          width: double.infinity,
-                                        )
-                                      : Container(), // If no image available, display nothing
-
+                                  Stack(
+                                    children: [
+                                      // Display the image (if available)
+                                      photoUrl != null
+                                          ? Image.network(
+                                              photoUrl,
+                                              fit: BoxFit.cover,
+                                              height: 180,
+                                              width: double.infinity,
+                                            )
+                                          : Container(height: 180, color: Colors.grey), // If no image available, display a grey container
+                                      Positioned(
+                                        top: 8,
+                                        right: 8,
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            color: Colors.white.withOpacity(0.8),
+                                            borderRadius: BorderRadius.circular(50),
+                                          ),
+                                          child: IconButton(
+                                            icon: Icon(Icons.bookmark_border, color: Colors.black),
+                                            onPressed: () {
+                                              // Handle bookmark action
+                                            },
+                                          ),
+                                        ),
+                                      ),
+                                      Positioned(
+                                        top: 8,
+                                        left: 8,
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            color: Colors.white.withOpacity(0.8),
+                                            borderRadius: BorderRadius.circular(50),
+                                          ),                                  
+                                          child: IconButton(
+                                            icon: Icon(Icons.delete_outline, color: Colors.black),
+                                            onPressed: () {
+                                              _deleteTrip(tripId);
+                                            },
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                   Padding(
                                     padding: const EdgeInsets.all(8.0),
                                     child: Column(
@@ -203,47 +230,109 @@ class TripsList extends StatelessWidget {
                                           style: TextStyle(fontSize: 14),
                                         ),
                                         SizedBox(height: 5),
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            ElevatedButton(
-                                              onPressed: () {
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) => TripDetailScreen(trip: trip),
-                                                  ),
-                                                );
-                                              },
-                                              child: Text('View Details'),
-                                            ),
-                                            IconButton(
-                                              icon: Icon(Icons.bookmark_border),
-                                              onPressed: () {
-                                                // Handle bookmark action
-                                              },
-                                            ),
-                                            IconButton(
-                                              icon: Icon(Icons.delete),
-                                              onPressed: () {
-                                                _deleteTrip(tripId);
-                                              },
-                                            ),
-                                          ],
-                                        ),
                                         if (tripType == 'upcoming')
-                                          ElevatedButton(
-                                            onPressed: () {
-                                              _updateTripType(tripId, 'ongoing');
-                                            },
-                                            child: Text('Start Trip'),
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              ElevatedButton(
+                                                onPressed: () {
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) => TripDetailScreen(trip: trip),
+                                                    ),
+                                                  );
+                                                },
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor: Color(0xFF0B5739),
+                                                  foregroundColor: Colors.white,
+                                                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius: BorderRadius.circular(8),
+                                                  ),
+                                                ),
+                                                child: Text('View Details'),
+                                              ),
+                                              ElevatedButton(
+                                                onPressed: () {
+                                                  _updateTripType(tripId, 'ongoing');
+                                                },
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor: Color(0xFF0B5739),
+                                                  foregroundColor: Colors.white,
+                                                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius: BorderRadius.circular(8),
+                                                  ),
+                                                ),
+                                                child: Text('Start Trip'),
+                                              ),
+                                            ],
                                           ),
                                         if (tripType == 'ongoing')
-                                          ElevatedButton(
-                                            onPressed: () {
-                                              _updateTripType(tripId, 'completed');
-                                            },
-                                            child: Text('Complete Trip'),
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              ElevatedButton(
+                                                onPressed: () {
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) => TripDetailScreen(trip: trip),
+                                                    ),
+                                                  );
+                                                },
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor: Color(0xFF0B5739),
+                                                  foregroundColor: Colors.white,
+                                                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius: BorderRadius.circular(8),
+                                                  ),
+                                                ),
+                                                child: Text('View Details'),
+                                              ),
+                                              ElevatedButton(
+                                                onPressed: () {
+                                                  _updateTripType(tripId, 'completed');
+                                                },
+                                                 style: ElevatedButton.styleFrom(
+                                                  backgroundColor: Color(0xFF0B5739),
+                                                  foregroundColor: Colors.white,
+                                                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius: BorderRadius.circular(8),
+                                                  ),
+                                                ),
+                                                child: Text('Complete Trip'),
+                                              ),
+                                            ],
+                                          ),
+                                        if (tripType == 'completed')
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              ElevatedButton(
+                                                
+                                                onPressed: () {
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) => TripDetailScreen(trip: trip),
+                                                    ),
+                                                  );
+                                                },
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor: Color(0xFF0B5739),
+                                                  foregroundColor: Colors.white,
+                                                  padding: EdgeInsets.symmetric(horizontal: 50, vertical: 8),
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius: BorderRadius.circular(8),
+                                                  ),
+                                                ),
+                                                child: Text('View Details'),                                                
+                                              ),
+                                            ],
                                           ),
                                       ],
                                     ),
