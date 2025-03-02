@@ -1,4 +1,16 @@
+import 'package:ar_flutter_plugin_engine/datatypes/config_planedetection.dart';
+import 'package:ar_flutter_plugin_engine/datatypes/hittest_result_types.dart';
+import 'package:ar_flutter_plugin_engine/datatypes/node_types.dart';
+import 'package:ar_flutter_plugin_engine/managers/ar_anchor_manager.dart';
+import 'package:ar_flutter_plugin_engine/managers/ar_location_manager.dart';
+import 'package:ar_flutter_plugin_engine/managers/ar_object_manager.dart';
+import 'package:ar_flutter_plugin_engine/managers/ar_session_manager.dart';
+import 'package:ar_flutter_plugin_engine/models/ar_anchor.dart';
+import 'package:ar_flutter_plugin_engine/models/ar_hittest_result.dart';
+import 'package:ar_flutter_plugin_engine/models/ar_node.dart';
+import 'package:ar_flutter_plugin_engine/widgets/ar_view.dart';
 import 'package:flutter/material.dart';
+import 'package:vector_math/vector_math_64.dart' as vectorMath64;
 
 class ArviewFor3dObjects extends StatefulWidget
 {
@@ -12,6 +24,61 @@ class ArviewFor3dObjects extends StatefulWidget
 }
 
 class _ArviewFor3dObjectsState extends State<ArviewFor3dObjects> {
+
+  ARSessionManager? sessionManagerAR;
+  ARObjectManager? objectManagerAR;
+  ARAnchorManager? anchorManagerAR;
+  List<ARNode> allNodesList = [];
+  List<ARAnchor> allAnchors = [];
+
+
+  createARView(
+      ARSessionManager arSessionManager,
+      ARObjectManager arObjectManager,
+      ARAnchorManager arAnchorManager,
+      ARLocationManager locationManagerAR)
+  {
+    sessionManagerAR = arSessionManager;
+    objectManagerAR = arObjectManager;
+    anchorManagerAR = arAnchorManager;
+
+    sessionManagerAR!.onInitialize(
+      handleRotation: true,
+      handlePans: true,
+      showWorldOrigin: true,
+      showFeaturePoints: false,
+      showPlanes: true,
+    );
+    objectManagerAR!.onInitialize();
+
+    sessionManagerAR!.onPlaneOrPointTap = detectPlaneAndLetUserTap;
+  }
+
+  Future<void> detectPlaneAndLetUserTap(List<ARHitTestResult> hitTapResultsList) async
+  {
+    var userHitTapResults = hitTapResultsList.firstWhere((ARHitTestResult userHitPoint)=> userHitPoint.type == ARHitTestResultType.plane);
+
+    if (userHitTapResults != null)
+      {
+        var planeARAnchor = ARPlaneAnchor(transformation: userHitTapResults.worldTransform);
+
+        bool? anchorAdded = await anchorManagerAR!.addAnchor(planeARAnchor);
+
+        if(anchorAdded!)
+          {
+            allAnchors.add(planeARAnchor);
+
+            var object3DNewNode = ARNode(
+              type: NodeType.webGLB,
+              uri: widget.model3durl,
+              scale: vectorMath64.Vector3(0.62, 0.62, 0.62),
+              position: vectorMath64.Vector3(0, 0, 0),
+              rotation: vectorMath64.Vector4(1, 0, 0, 0),
+            );
+          }
+      }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,6 +86,16 @@ class _ArviewFor3dObjectsState extends State<ArviewFor3dObjects> {
         title: Text('${widget.name} AR View'),
         centerTitle: true,
       ),
+      body: Stack(
+        children: [
+
+          ARView(
+            planeDetectionConfig: PlaneDetectionConfig.horizontalAndVertical,
+            onARViewCreated: createARView,
+          ),
+        ],
+      )
+      
     );
   }
 }
