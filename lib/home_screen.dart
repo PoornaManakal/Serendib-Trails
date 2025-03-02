@@ -97,7 +97,13 @@ class _HomeScreenState extends State<HomeScreen>
                                           width: 55,
                                           child: Center(
                                             child: ElevatedButton(
-                                              onPressed: (){},
+                                              onPressed: ()
+                                              {
+                                                Navigator.push(context, MaterialPageRoute(builder: (c)=> ArviewFor3dObjects(
+                                                    name: each3dItem["name"],
+                                                    model3durl: each3dItem["model3dUrl"]
+                                                )));
+                                              },
                                               style: ElevatedButton.styleFrom(
                                                 padding: EdgeInsets.all(0),
                                                 backgroundColor: Colors.white,
@@ -106,7 +112,7 @@ class _HomeScreenState extends State<HomeScreen>
                                                 ),
                                               ),
                                               child: const Icon(
-                                                Icons.add_circle,
+                                                Icons.phone_android_sharp,
                                                 color: Colors.black,
                                               ),
                         ),
