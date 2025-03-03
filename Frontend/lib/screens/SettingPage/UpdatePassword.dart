@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:serendib_trails/screens/Login_Screens/SignIn_screen.dart';
 
 class UpdatePasswordPage extends StatefulWidget {
   @override
@@ -13,11 +14,8 @@ class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
   final _oldPasswordController = TextEditingController();
   final _newPasswordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+  bool ispasswordHidden = true;
 
-  // List of pages for Bottom Navigation
-  
-
-  
   Future<void> _updatePassword() async {
     if (_formKey.currentState!.validate()) {
       try {
@@ -36,16 +34,28 @@ class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
         await user.updatePassword(_newPasswordController.text);
 
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Password updated successfully')),
+          SnackBar(content: Text('Password updated successfully'),
+          backgroundColor: Colors.green,),
         );
 
         // Clear the text fields
         _oldPasswordController.clear();
         _newPasswordController.clear();
         _confirmPasswordController.clear();
+
+        await FirebaseAuth.instance.signOut();
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => SigninScreen()),
+          (Route<dynamic> route) => false,
+        );
+
+
+        
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${e.toString()}')),
+          SnackBar(content: Text('Failed to update password'),
+          backgroundColor: Colors.red,),
         );
       }
     }
@@ -114,13 +124,13 @@ class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
           ),
         ),
       ),
-      
     );
   }
 
   Widget _buildTextField(String hint, TextEditingController controller) {
     return TextFormField(
       controller: controller,
+      obscureText: ispasswordHidden,
       decoration: InputDecoration(
         hintText: hint,
         filled: true,
@@ -130,8 +140,15 @@ class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
           borderSide: BorderSide.none,
         ),
         contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        suffixIcon: IconButton(
+          icon: Icon(ispasswordHidden ? Icons.visibility_off : Icons.visibility),
+          onPressed: () {
+            setState(() {
+              ispasswordHidden = !ispasswordHidden;
+            });
+          },
+        ),
       ),
-      obscureText: true,
       validator: (value) {
         if (value == null || value.isEmpty) {
           return 'Please enter $hint';
@@ -140,7 +157,7 @@ class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
           return "Password must be at least 6 characters";
         }
         if (hint == "Confirm password" && value != _newPasswordController.text) {
-          return 'Passwords does not match';
+          return 'Passwords do not match';
         }
         return null;
       },

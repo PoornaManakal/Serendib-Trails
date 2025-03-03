@@ -106,7 +106,7 @@ class _AttractionsScreenState extends State<AttractionsScreen> {
           inputLatitude = data["results"][0]["geometry"]["location"]["lat"];
           inputLongitude = data["results"][0]["geometry"]["location"]["lng"];
           _autocompleteResults = []; // Clear suggestions after selection
-          locationController.clear(); // Clear input field after selection
+          //locationController.clear(); // Clear input field after selection
         });
         fetchPlaces(); // Fetch attractions after getting new coordinates
       }
@@ -333,6 +333,7 @@ class _AttractionsScreenState extends State<AttractionsScreen> {
                               icon: Icon(Icons.my_location,
                                   color: Color(0xFF0B5739)),
                               onPressed: () {
+                                locationController.clear();
                                 setState(() {
                                   inputLatitude = null;
                                   inputLongitude = null;
@@ -459,7 +460,15 @@ class _AttractionsScreenState extends State<AttractionsScreen> {
                   Padding(
                     padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
                     child: ElevatedButton(
-                      onPressed: _saveTripToFirebase,
+                      onPressed: () {
+                        if(suggestedPlaces.isNotEmpty) {
+                          _saveTripToFirebase();
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('No places found to save.')),
+                          );
+                        }
+                      },
                       child: Text('Add Trip'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Color(0xFF0B5739), // Button color
