@@ -157,7 +157,7 @@ class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
           return "Password must be at least 6 characters";
         }
         if (hint == "Confirm password" && value != _newPasswordController.text) {
-          return 'Passwords do not match';
+          return 'Passwords does not match';
         }
         return null;
       },
