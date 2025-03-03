@@ -15,9 +15,14 @@ class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
   final _newPasswordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   bool ispasswordHidden = true;
+  bool _isLoading = false;
 
   Future<void> _updatePassword() async {
     if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
+
       try {
         User? user = FirebaseAuth.instance.currentUser;
         String email = user!.email!;
@@ -50,13 +55,15 @@ class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
           (Route<dynamic> route) => false,
         );
 
-
-        
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to update password'),
           backgroundColor: Colors.red,),
         );
+      } finally {
+        setState(() {
+          _isLoading = false;
+        });
       }
     }
   }
@@ -105,20 +112,25 @@ class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
               _buildTextField("Confirm password", _confirmPasswordController),
               SizedBox(height: 30),
               Center(
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF0B5739),
-                    minimumSize: Size(double.infinity, 50),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  onPressed: _updatePassword,
-                  child: Text(
-                    "Update password",
-                    style: TextStyle(color: Colors.white, fontSize: 16),
-                  ),
-                ),
+                child: _isLoading
+                    ? CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                          Color(0xFF0B5739)),
+                    )
+                    : ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color(0xFF0B5739),
+                          minimumSize: Size(double.infinity, 50),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        onPressed: _updatePassword,
+                        child: Text(
+                          "Update password",
+                          style: TextStyle(color: Colors.white, fontSize: 16),
+                        ),
+                      ),
               ),
             ],
           ),
@@ -157,7 +169,7 @@ class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
           return "Password must be at least 6 characters";
         }
         if (hint == "Confirm password" && value != _newPasswordController.text) {
-          return 'Passwords does not match';
+          return 'Passwords do not match';
         }
         return null;
       },
