@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:serendib_trails/screens/Accomodations/Accomodations.dart';
 import 'package:serendib_trails/screens/BucketListPage.dart';
-import 'package:serendib_trails/screens/Explore.dart';
+import 'package:serendib_trails/screens/Favourites/Favourites.dart';
 import 'package:serendib_trails/screens/Home.dart';
 import 'package:serendib_trails/screens/SettingPage/setting.dart';
 import 'package:serendib_trails/screens/Attractions/select_interests_screen.dart';

@@ -300,7 +300,10 @@ class _AttractionsScreenState extends State<AttractionsScreen> {
           ],
         ),
         body: _currentPosition == null
-            ? Center(child: CircularProgressIndicator())
+            ? Center(child: CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(
+                          Color(0xFF0B5739)),
+            ))
             : Column(
                 children: [
                   Padding(
