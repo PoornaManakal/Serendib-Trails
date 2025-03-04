@@ -57,61 +57,143 @@ class _HomeScreenState extends State<HomeScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Welcome, $userName!",
-            style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold)), // Display user's name
-        backgroundColor: const Color(0xFF0B5739), // Green color
-        iconTheme: IconThemeData(color: Colors.white),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.logout, color: Colors.white),
-            onPressed: () async {
-              await FirebaseAuth.instance.signOut(); // Sign out the user
-              Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const SigninScreen()));
-            },
-          ),
-        ],
-        bottom: PreferredSize(
-          preferredSize: Size.fromHeight(kToolbarHeight),
-          child: Container(
-            color: Color(0xFFFEF7FF), // Background color of the TabBar
-            child: TabBar(
-              controller: _tabController,
-              indicator: UnderlineTabIndicator(
-                borderSide: BorderSide(
-                    width: 4.0,
-                    color: Color(
-                        0xFF0B5739)), // Customize the underline color and thickness
-                insets: EdgeInsets.symmetric(
-                    horizontal:
-                        16.0), // Customize the horizontal padding of the underline
+    return WillPopScope(
+      onWillPop: () async {
+        final shouldPop = await showDialog<bool>(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius:
+                    BorderRadius.circular(16), // Rounded corners for the dialog
               ),
-              labelColor: Color(0xFF0B5739), // Color of the selected tab label
-              unselectedLabelColor:
-                  Colors.grey, // Color of the unselected tab label
-              tabs: [
-                Tab(text: "Ongoing Trips"),
-                Tab(text: "Upcoming Trips"),
-                Tab(text: "Past Trips"),
+              titlePadding: EdgeInsets.all(20), // Padding for title
+              title: Center(
+                child: Text(
+                  'Are you sure you want to exit?',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              contentPadding: EdgeInsets.zero, // Remove extra spacing
+              actionsPadding: EdgeInsets.zero, // Align buttons to edges
+              actions: [
+                Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.vertical(
+                        bottom: Radius.circular(16)), // Rounded bottom
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: TextButton(
+                          onPressed: () => Navigator.of(context).pop(false),
+                          style: TextButton.styleFrom(
+                            backgroundColor:
+                                Colors.grey.shade400, // Gray button
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.only(
+                                bottomLeft:
+                                    Radius.circular(16), // Rounded left corner
+                              ),
+                            ),
+                          ),
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                                vertical: 5), // Button height
+                            child: Text('No',
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 16)),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: TextButton(
+                          onPressed: () => Navigator.of(context).pop(true),
+                          style: TextButton.styleFrom(
+                            backgroundColor: Color(0xFF0B5739),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.only(
+                                bottomRight:
+                                    Radius.circular(16), // Rounded right corner
+                              ),
+                            ),
+                          ),
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                                vertical: 5), // Button height
+                            child: Text('Yes',
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 16)),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ],
+            );
+          },
+        );
+        return shouldPop ?? false;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text("Welcome, $userName!",
+              style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold)), // Display user's name
+          backgroundColor: const Color(0xFF0B5739), // Green color
+          iconTheme: IconThemeData(color: Colors.white),
+          actions: [
+            IconButton(
+              icon: Icon(Icons.logout, color: Colors.white),
+              onPressed: () async {
+                await FirebaseAuth.instance.signOut(); // Sign out the user
+                Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const SigninScreen()));
+              },
+            ),
+          ],
+          bottom: PreferredSize(
+            preferredSize: Size.fromHeight(kToolbarHeight),
+            child: Container(
+              color: Color(0xFFFEF7FF), // Background color of the TabBar
+              child: TabBar(
+                controller: _tabController,
+                indicator: UnderlineTabIndicator(
+                  borderSide: BorderSide(
+                      width: 4.0,
+                      color: Color(
+                          0xFF0B5739)), // Customize the underline color and thickness
+                  insets: EdgeInsets.symmetric(
+                      horizontal:
+                          16.0), // Customize the horizontal padding of the underline
+                ),
+                labelColor:
+                    Color(0xFF0B5739), // Color of the selected tab label
+                unselectedLabelColor:
+                    Colors.grey, // Color of the unselected tab label
+                tabs: [
+                  Tab(text: "Ongoing Trips"),
+                  Tab(text: "Upcoming Trips"),
+                  Tab(text: "Past Trips"),
+                ],
+              ),
             ),
           ),
         ),
-      ),
-      drawer: SideMenu(),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          TripsList(user: user, tripType: 'ongoing'),
-          TripsList(user: user, tripType: 'upcoming'),
-          TripsList(user: user, tripType: 'completed'),
-        ],
+        drawer: SideMenu(),
+        body: TabBarView(
+          controller: _tabController,
+          children: [
+            TripsList(user: user, tripType: 'ongoing'),
+            TripsList(user: user, tripType: 'upcoming'),
+            TripsList(user: user, tripType: 'completed'),
+          ],
+        ),
       ),
     );
   }
@@ -133,7 +215,8 @@ class TripsList extends StatelessWidget {
     await FirebaseFirestore.instance.collection('trips').doc(tripId).delete();
   }
 
-  Future<void> _saveFavoriteTrip(BuildContext context, Map<String, dynamic> trip, String tripId) async {
+  Future<void> _saveFavoriteTrip(
+      BuildContext context, Map<String, dynamic> trip, String tripId) async {
     if (user != null) {
       final userId = user!.uid;
 
@@ -148,14 +231,20 @@ class TripsList extends StatelessWidget {
         // Trip does not exist, add it to the collection
         trip['userId'] = userId;
         trip['tripId'] = tripId; // Add tripId to the trip data
-        await FirebaseFirestore.instance.collection('favourite_trips').add(trip);
+        await FirebaseFirestore.instance
+            .collection('favourite_trips')
+            .add(trip);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Trip added to favourites'), backgroundColor: Colors.green),
+          SnackBar(
+              content: Text('Trip added to favourites'),
+              backgroundColor: Colors.green),
         );
       } else {
         // Trip already exists, show a message or handle accordingly
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Trip already added to favourites'), backgroundColor: Colors.orange),
+          SnackBar(
+              content: Text('Trip already added to favourites'),
+              backgroundColor: Colors.orange),
         );
         print('Trip already added to favourites');
       }
@@ -237,7 +326,8 @@ class TripsList extends StatelessWidget {
                                                 color: Colors.black),
                                             onPressed: () {
                                               // Handle bookmark action
-                                             _saveFavoriteTrip(context, trip, tripId);
+                                              _saveFavoriteTrip(
+                                                  context, trip, tripId);
                                             },
                                           ),
                                         ),
