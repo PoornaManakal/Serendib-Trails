@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 //import 'package:first_project/AccountPage.dart';
 import 'package:serendib_trails/screens/BucketListPage.dart';
 import 'package:serendib_trails/screens/Create_a_plan.dart';
-import 'package:serendib_trails/screens/Explore.dart';
+import 'package:serendib_trails/screens/Favourites/Favourites.dart';
 import 'package:serendib_trails/screens/Home.dart';
 import 'package:serendib_trails/screens/SettingPage/SendFeedback.dart';
 import 'package:serendib_trails/screens/SettingPage/setting.dart';

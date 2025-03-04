@@ -17,7 +17,8 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
+class _HomeScreenState extends State<HomeScreen>
+    with SingleTickerProviderStateMixin {
   String userName = "User"; // Default value
   User? user = FirebaseAuth.instance.currentUser; // Get the logged-in user
   late TabController _tabController;
@@ -58,7 +59,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Welcome, $userName!", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)), // Display user's name
+        title: Text("Welcome, $userName!",
+            style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold)), // Display user's name
         backgroundColor: const Color(0xFF0B5739), // Green color
         iconTheme: IconThemeData(color: Colors.white),
         actions: [
@@ -80,11 +84,17 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             child: TabBar(
               controller: _tabController,
               indicator: UnderlineTabIndicator(
-                borderSide: BorderSide(width: 4.0, color: Color(0xFF0B5739)), // Customize the underline color and thickness
-                insets: EdgeInsets.symmetric(horizontal: 16.0), // Customize the horizontal padding of the underline
+                borderSide: BorderSide(
+                    width: 4.0,
+                    color: Color(
+                        0xFF0B5739)), // Customize the underline color and thickness
+                insets: EdgeInsets.symmetric(
+                    horizontal:
+                        16.0), // Customize the horizontal padding of the underline
               ),
               labelColor: Color(0xFF0B5739), // Color of the selected tab label
-              unselectedLabelColor: Colors.grey, // Color of the unselected tab label
+              unselectedLabelColor:
+                  Colors.grey, // Color of the unselected tab label
               tabs: [
                 Tab(text: "Ongoing Trips"),
                 Tab(text: "Upcoming Trips"),
@@ -123,6 +133,35 @@ class TripsList extends StatelessWidget {
     await FirebaseFirestore.instance.collection('trips').doc(tripId).delete();
   }
 
+  Future<void> _saveFavoriteTrip(BuildContext context, Map<String, dynamic> trip, String tripId) async {
+    if (user != null) {
+      final userId = user!.uid;
+
+      // Check if the trip already exists in the favourite_trips collection for the current user
+      final querySnapshot = await FirebaseFirestore.instance
+          .collection('favourite_trips')
+          .where('userId', isEqualTo: userId)
+          .where('tripId', isEqualTo: tripId)
+          .get();
+
+      if (querySnapshot.docs.isEmpty) {
+        // Trip does not exist, add it to the collection
+        trip['userId'] = userId;
+        trip['tripId'] = tripId; // Add tripId to the trip data
+        await FirebaseFirestore.instance.collection('favourite_trips').add(trip);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Trip added to favourites'), backgroundColor: Colors.green),
+        );
+      } else {
+        // Trip already exists, show a message or handle accordingly
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Trip already added to favourites'), backgroundColor: Colors.orange),
+        );
+        print('Trip already added to favourites');
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -157,11 +196,13 @@ class TripsList extends StatelessWidget {
                       return ListView.builder(
                         itemCount: trips.length,
                         itemBuilder: (context, index) {
-                          final trip = trips[index].data() as Map<String, dynamic>;
+                          final trip =
+                              trips[index].data() as Map<String, dynamic>;
                           final tripId = trips[index].id;
                           final photoUrl = trip['photoUrl'] as String?;
                           return Card(
-                            margin: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                            margin: EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 15),
                             elevation: 5,
                             child: GestureDetector(
                               child: Column(
@@ -177,19 +218,26 @@ class TripsList extends StatelessWidget {
                                               height: 180,
                                               width: double.infinity,
                                             )
-                                          : Container(height: 180, color: Colors.grey), // If no image available, display a grey container
+                                          : Container(
+                                              height: 180,
+                                              color: Colors
+                                                  .grey), // If no image available, display a grey container
                                       Positioned(
                                         top: 8,
                                         right: 8,
                                         child: Container(
                                           decoration: BoxDecoration(
-                                            color: Colors.white.withOpacity(0.8),
-                                            borderRadius: BorderRadius.circular(50),
+                                            color:
+                                                Colors.white.withOpacity(0.8),
+                                            borderRadius:
+                                                BorderRadius.circular(50),
                                           ),
                                           child: IconButton(
-                                            icon: Icon(Icons.bookmark_border, color: Colors.black),
+                                            icon: Icon(Icons.bookmark_border,
+                                                color: Colors.black),
                                             onPressed: () {
                                               // Handle bookmark action
+                                             _saveFavoriteTrip(context, trip, tripId);
                                             },
                                           ),
                                         ),
@@ -199,11 +247,14 @@ class TripsList extends StatelessWidget {
                                         left: 8,
                                         child: Container(
                                           decoration: BoxDecoration(
-                                            color: Colors.white.withOpacity(0.8),
-                                            borderRadius: BorderRadius.circular(50),
-                                          ),                                  
+                                            color:
+                                                Colors.white.withOpacity(0.8),
+                                            borderRadius:
+                                                BorderRadius.circular(50),
+                                          ),
                                           child: IconButton(
-                                            icon: Icon(Icons.delete_outline, color: Colors.black),
+                                            icon: Icon(Icons.delete_outline,
+                                                color: Colors.black),
                                             onPressed: () {
                                               _deleteTrip(tripId);
                                             },
@@ -215,7 +266,8 @@ class TripsList extends StatelessWidget {
                                   Padding(
                                     padding: const EdgeInsets.all(8.0),
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           trip['cityName'] ?? "No name",
@@ -232,37 +284,51 @@ class TripsList extends StatelessWidget {
                                         SizedBox(height: 5),
                                         if (tripType == 'upcoming')
                                           Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
                                             children: [
                                               ElevatedButton(
                                                 onPressed: () {
                                                   Navigator.push(
                                                     context,
                                                     MaterialPageRoute(
-                                                      builder: (context) => TripDetailScreen(trip: trip),
+                                                      builder: (context) =>
+                                                          TripDetailScreen(
+                                                              trip: trip),
                                                     ),
                                                   );
                                                 },
                                                 style: ElevatedButton.styleFrom(
-                                                  backgroundColor: Color(0xFF0B5739),
+                                                  backgroundColor:
+                                                      Color(0xFF0B5739),
                                                   foregroundColor: Colors.white,
-                                                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                                                  padding: EdgeInsets.symmetric(
+                                                      horizontal: 20,
+                                                      vertical: 8),
                                                   shape: RoundedRectangleBorder(
-                                                    borderRadius: BorderRadius.circular(8),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            8),
                                                   ),
                                                 ),
                                                 child: Text('View Details'),
                                               ),
                                               ElevatedButton(
                                                 onPressed: () {
-                                                  _updateTripType(tripId, 'ongoing');
+                                                  _updateTripType(
+                                                      tripId, 'ongoing');
                                                 },
                                                 style: ElevatedButton.styleFrom(
-                                                  backgroundColor: Color(0xFF0B5739),
+                                                  backgroundColor:
+                                                      Color(0xFF0B5739),
                                                   foregroundColor: Colors.white,
-                                                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                                                  padding: EdgeInsets.symmetric(
+                                                      horizontal: 20,
+                                                      vertical: 8),
                                                   shape: RoundedRectangleBorder(
-                                                    borderRadius: BorderRadius.circular(8),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            8),
                                                   ),
                                                 ),
                                                 child: Text('Start Trip'),
@@ -271,37 +337,51 @@ class TripsList extends StatelessWidget {
                                           ),
                                         if (tripType == 'ongoing')
                                           Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
                                             children: [
                                               ElevatedButton(
                                                 onPressed: () {
                                                   Navigator.push(
                                                     context,
                                                     MaterialPageRoute(
-                                                      builder: (context) => TripDetailScreen(trip: trip),
+                                                      builder: (context) =>
+                                                          TripDetailScreen(
+                                                              trip: trip),
                                                     ),
                                                   );
                                                 },
                                                 style: ElevatedButton.styleFrom(
-                                                  backgroundColor: Color(0xFF0B5739),
+                                                  backgroundColor:
+                                                      Color(0xFF0B5739),
                                                   foregroundColor: Colors.white,
-                                                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                                                  padding: EdgeInsets.symmetric(
+                                                      horizontal: 20,
+                                                      vertical: 8),
                                                   shape: RoundedRectangleBorder(
-                                                    borderRadius: BorderRadius.circular(8),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            8),
                                                   ),
                                                 ),
                                                 child: Text('View Details'),
                                               ),
                                               ElevatedButton(
                                                 onPressed: () {
-                                                  _updateTripType(tripId, 'completed');
+                                                  _updateTripType(
+                                                      tripId, 'completed');
                                                 },
-                                                 style: ElevatedButton.styleFrom(
-                                                  backgroundColor: Color(0xFF0B5739),
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor:
+                                                      Color(0xFF0B5739),
                                                   foregroundColor: Colors.white,
-                                                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                                                  padding: EdgeInsets.symmetric(
+                                                      horizontal: 20,
+                                                      vertical: 8),
                                                   shape: RoundedRectangleBorder(
-                                                    borderRadius: BorderRadius.circular(8),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            8),
                                                   ),
                                                 ),
                                                 child: Text('Complete Trip'),
@@ -310,27 +390,34 @@ class TripsList extends StatelessWidget {
                                           ),
                                         if (tripType == 'completed')
                                           Row(
-                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
                                             children: [
                                               ElevatedButton(
-                                                
                                                 onPressed: () {
                                                   Navigator.push(
                                                     context,
                                                     MaterialPageRoute(
-                                                      builder: (context) => TripDetailScreen(trip: trip),
+                                                      builder: (context) =>
+                                                          TripDetailScreen(
+                                                              trip: trip),
                                                     ),
                                                   );
                                                 },
                                                 style: ElevatedButton.styleFrom(
-                                                  backgroundColor: Color(0xFF0B5739),
+                                                  backgroundColor:
+                                                      Color(0xFF0B5739),
                                                   foregroundColor: Colors.white,
-                                                  padding: EdgeInsets.symmetric(horizontal: 50, vertical: 8),
+                                                  padding: EdgeInsets.symmetric(
+                                                      horizontal: 50,
+                                                      vertical: 8),
                                                   shape: RoundedRectangleBorder(
-                                                    borderRadius: BorderRadius.circular(8),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            8),
                                                   ),
                                                 ),
-                                                child: Text('View Details'),                                                
+                                                child: Text('View Details'),
                                               ),
                                             ],
                                           ),
