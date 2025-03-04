@@ -1,9 +1,9 @@
-// filepath: /Users/chamodpankaja/Documents/IIT/L5/SDGP/Serendib-Trails/Frontend/lib/screens/Favourites/Favourites.dart
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:serendib_trails/screens/Attractions/details.dart';
 import 'package:serendib_trails/screens/main_screen.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class FavouritesScreen extends StatefulWidget {
   const FavouritesScreen({super.key});
@@ -84,7 +84,7 @@ class _FavouritesScreenState extends State<FavouritesScreen> with SingleTickerPr
           controller: _tabController,
           children: [
             TripsTab(),
-            Center(child: Text("Attractions Content Here")),
+            AttractionsTab(),
             Center(child: Text("Accommodations Content Here")),
             Center(child: Text("Transportations Content Here")),
           ],
@@ -154,7 +154,7 @@ class TripsTab extends StatelessWidget {
                               icon: Icon(Icons.bookmark, color: Colors.black),
                               onPressed: () {
                                 // Handle bookmark action
-                                _removeFavoriteTrip(tripId);
+                                _removeFavoriteTrip(context, tripId);
                               },
                             ),
                           ),
@@ -214,7 +214,154 @@ class TripsTab extends StatelessWidget {
     );
   }
 
-  Future<void> _removeFavoriteTrip(String tripId) async {
+  Future<void> _removeFavoriteTrip(BuildContext context, String tripId) async {
     await FirebaseFirestore.instance.collection('favourite_trips').doc(tripId).delete();
+  }
+}
+
+class AttractionsTab extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) {
+      return Center(child: Text("Please log in to see your favorite places."));
+    }
+
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('favourite_places')
+          .where('userId', isEqualTo: user.uid)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        }
+        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          return Center(child: Text("No favourite places found"));
+        }
+        final places = snapshot.data!.docs;
+        return ListView.builder(
+          itemCount: places.length,
+          itemBuilder: (context, index) {
+            final place = places[index].data() as Map<String, dynamic>;
+            final placeId = places[index].id;
+            final photoUrl = place['photoUrl'] as String?;
+            return Card(
+              margin: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+              elevation: 5,
+              child: GestureDetector(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Stack(
+                      children: [
+                        // Display the image (if available)
+                        photoUrl != null
+                            ? Image.network(
+                                photoUrl,
+                                fit: BoxFit.cover,
+                                height: 180,
+                                width: double.infinity,
+                              )
+                            : Container(
+                                height: 180,
+                                color: Colors.grey), // If no image available, display a grey container
+                        Positioned(
+                          top: 8,
+                          right: 8,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.8),
+                              borderRadius: BorderRadius.circular(50),
+                            ),
+                            child: IconButton(
+                              icon: Icon(Icons.bookmark, color: Colors.black),
+                              onPressed: () {
+                                // Handle bookmark action
+                                _removeFavoritePlace(context, placeId);
+                              },
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            place['name'] ?? "No name",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                            ),
+                          ),
+                          SizedBox(height: 5),
+                          Text(
+                            place['vicinity'] ?? "No address",
+                            style: TextStyle(fontSize: 14),
+                          ),
+                          SizedBox(height: 5),
+                          Row(
+                            children: [
+                              Text(
+                                "Rating: ",
+                                style: TextStyle(fontSize: 14),
+                              ),
+                              Icon(Icons.star, color: Colors.amber, size: 16),
+                              Text(
+                                " ${place['rating']?.toString() ?? 'N/A'}",
+                                style: TextStyle(fontSize: 14),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 5),
+                          Center(
+                            child: ElevatedButton(
+                              onPressed: () {
+                                _openInGoogleMaps(context, place['name'], place['placeId']);
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Color(0xFF0B5739),
+                                foregroundColor: Colors.white,
+                                padding: EdgeInsets.symmetric(horizontal: 50, vertical: 8),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                              child: Text('View in Maps'),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Future<void> _removeFavoritePlace(BuildContext context, String placeId) async {
+    await FirebaseFirestore.instance.collection('favourite_places').doc(placeId).delete();
+  }
+
+  void _openInGoogleMaps(BuildContext context, String placeName, String placeId) async {
+    String encodedPlaceName = Uri.encodeComponent(placeName);
+    String googleMapsUrl =
+        "https://www.google.com/maps/search/?api=1&query=$encodedPlaceName&query_place_id=$placeId";
+
+    if (await canLaunchUrl(Uri.parse(googleMapsUrl))) {
+      await launchUrl(Uri.parse(googleMapsUrl));
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Could not open Google Maps.')),
+      );
+    }
   }
 }
