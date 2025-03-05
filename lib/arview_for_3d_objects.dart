@@ -52,7 +52,49 @@ class _ArviewFor3dObjectsState extends State<ArviewFor3dObjects> {
     objectManagerAR!.onInitialize();
 
     sessionManagerAR!.onPlaneOrPointTap = detectPlaneAndLetUserTap;
+    objectManagerAR!.onPanStart = duringOnPanStarted;
+    objectManagerAR!.onPanChange = duringOnPanChanged;
+    objectManagerAR!.onPanEnd = duringOnPanEnded;
+    objectManagerAR!.onRotationStart = duringOnRotationStarted;
+    objectManagerAR!.onRotationChange = duringOnRotationChanged;
+    objectManagerAR!.onRotationEnd = duringOnRotationEnded;
+
   }
+
+  duringOnPanStarted(String object3DNodeName)
+  {
+    print("Panning Node Started = " + object3DNodeName);
+  }
+
+  duringOnPanChanged(String object3DNodeName)
+  {
+    print("Panning Node Continued = " + object3DNodeName);
+  }
+
+  duringOnPanEnded(String object3DNodeName, Matrix4 transformationMatrix4)
+  {
+    print("Panning Node Ended = " + object3DNodeName);
+
+    final pannedNode = allNodesList.firstWhere((node) => node.name == object3DNodeName);
+  }
+
+  duringOnRotationStarted(String object3DNodeName)
+  {
+    print("Rotating Node Started = " + object3DNodeName);
+  }
+
+  duringOnRotationChanged(String object3DNodeName)
+  {
+    print("Rotating Node Continued = " + object3DNodeName);
+  }
+
+  duringOnRotationEnded(String object3DNodeName, Matrix4 transformationMatrix4)
+  {
+    print("Rotating Node Ended = " + object3DNodeName);
+
+    final pannedNode = allNodesList.firstWhere((node) => node.name == object3DNodeName);
+  }
+
 
   Future<void> detectPlaneAndLetUserTap(List<ARHitTestResult> hitTapResultsList) async
   {
