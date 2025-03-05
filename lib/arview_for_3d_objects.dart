@@ -75,7 +75,22 @@ class _ArviewFor3dObjectsState extends State<ArviewFor3dObjects> {
               position: vectorMath64.Vector3(0, 0, 0),
               rotation: vectorMath64.Vector4(1, 0, 0, 0),
             );
+
+            bool? addARNodeToAnchor = await objectManagerAR!.addNode(object3DNewNode, planeAnchor: planeARAnchor);
+            if(addARNodeToAnchor!)
+              {
+                allNodesList.add(object3DNewNode);
+              }
+            else
+              {
+                sessionManagerAR!.onError("Adding Node to Anchor Failed");
+              }
+
           }
+        else
+        {
+          sessionManagerAR!.onError("Filed Anchor cannot be added");
+        }
       }
   }
 
