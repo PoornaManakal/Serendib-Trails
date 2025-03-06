@@ -28,6 +28,8 @@ class _ProfilePageState extends State<ProfilePage> {
   FocusNode phoneFocusNode = FocusNode();
   FocusNode dobFocusNode = FocusNode();
 
+  final _formKey = GlobalKey<FormState>();
+
   @override
   void initState() {
     super.initState();
@@ -53,18 +55,21 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> _saveUserData() async {
-    if (user != null) {
-      await _firestore.collection("users").doc(user!.uid).set({
-        "name": nameController.text,
-        "phone": phoneController.text,
-        "dob": dobController.text,
-        "gender": isMaleSelected ? "Male" : "Female",
-        "profilePic": profilePicUrl,
-      }, SetOptions(merge: true));
+    if (_formKey.currentState!.validate()) {
+      if (user != null) {
+        await _firestore.collection("users").doc(user!.uid).set({
+          "name": nameController.text,
+          "phone": phoneController.text,
+          "dob": dobController.text,
+          "gender": isMaleSelected ? "Male" : "Female",
+          "profilePic": profilePicUrl,
+        }, SetOptions(merge: true));
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Profile updated successfully!")),
-      );
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Profile updated successfully!")
+          ,backgroundColor: Colors.green,),
+        );
+      }
     }
   }
 
@@ -156,106 +161,155 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Stack(
-                children: [
-                  CircleAvatar(
-                    radius: 50,
-                    backgroundImage: profilePicUrl.isNotEmpty
-                        ? NetworkImage(profilePicUrl)
-                        : AssetImage("lib/assets/images/default_profile.jpg")
-                            as ImageProvider,
-                  ),
-                  Positioned(
-                    bottom: 5,
-                    right: 5,
-                    child: Row(
-                      children: [
-                        GestureDetector(
-                          onTap: _pickAndUploadImage,
-                          child: CircleAvatar(
-                            backgroundColor: Color(0xFF0B5739),
-                            radius: 18,
-                            child: Icon(Icons.camera_alt,
-                                color: Colors.white, size: 18),
-                          ),
-                        ),
-                        SizedBox(width: 8),
-                        if (profilePicUrl
-                            .isNotEmpty) // Show delete button only if an image exists
-                          SizedBox(width: 8),
-                        if (profilePicUrl.isNotEmpty)
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Stack(
+                  children: [
+                    CircleAvatar(
+                      radius: 50,
+                      backgroundImage: profilePicUrl.isNotEmpty
+                          ? NetworkImage(profilePicUrl)
+                          : AssetImage("lib/assets/images/default_profile.jpg")
+                              as ImageProvider,
+                    ),
+                    Positioned(
+                      bottom: 5,
+                      right: 5,
+                      child: Row(
+                        children: [
                           GestureDetector(
-                            onTap: _deleteProfilePicture,
+                            onTap: _pickAndUploadImage,
                             child: CircleAvatar(
-                              backgroundColor: Colors.red,
+                              backgroundColor: Color(0xFF0B5739),
                               radius: 18,
-                              child: Icon(Icons.delete,
+                              child: Icon(Icons.camera_alt,
                                   color: Colors.white, size: 18),
                             ),
                           ),
-                      ],
+                          SizedBox(width: 8),
+                          if (profilePicUrl
+                              .isNotEmpty) // Show delete button only if an image exists
+                            SizedBox(width: 8),
+                          if (profilePicUrl.isNotEmpty)
+                            GestureDetector(
+                              onTap: _deleteProfilePicture,
+                              child: CircleAvatar(
+                                backgroundColor: Colors.red,
+                                radius: 18,
+                                child: Icon(Icons.delete,
+                                    color: Colors.white, size: 18),
+                              ),
+                            ),
+                        ],
+                      ),
                     ),
-                  ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 20),
+              _buildLabel("Name"),
+              _buildTextField(nameController, "Enter your name", nameFocusNode),
+              _buildLabel("Email"),
+              TextFormField(
+                controller: TextEditingController(text: email),
+                readOnly: true,
+                decoration: InputDecoration(
+                  contentPadding:
+                      EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10)),
+                  filled: true,
+                  fillColor: Colors.grey[300],
+                ),
+              ),
+              _buildLabel("Phone Number"),
+              _buildTextField(
+                  phoneController, "Enter phone number", phoneFocusNode,
+                  validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter your phone number';
+                } else if (!RegExp(r'^\d{10}$').hasMatch(value)) {
+                  return 'Please enter a valid 10-digit phone number';
+                }
+                return null;
+              }),
+              _buildLabel("Date of Birth"),
+              _buildTextField(
+                  dobController, "Enter your date of birth", dobFocusNode,
+                  validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter your date of birth';
+                }
+
+                // Check if the format is valid
+                final RegExp dobRegExp = RegExp(
+                    r'^(0[1-9]|[12][0-9]|3[01])/(0[1-9]|1[0-2])/(19|20)\d{2}$');
+
+                if (!dobRegExp.hasMatch(value)) {
+                  return 'Please enter a valid date in the format DD/MM/YYYY';
+                }
+
+                // Additional logical validation
+                try {
+                  List<String> parts = value.split('/');
+                  int day = int.parse(parts[0]);
+                  int month = int.parse(parts[1]);
+                  int year = int.parse(parts[2]);
+
+                  DateTime dob = DateTime(year, month, day);
+                  DateTime today = DateTime.now();
+
+                  // Ensure the date is not in the future
+                  if (dob.isAfter(today)) {
+                    return 'Date of birth cannot be in the future';
+                  }
+
+                  // Ensure reasonable age (e.g., no one born before 1900)
+                  if (year < 1900) {
+                    return 'Please enter a valid birth year (after 1900)';
+                  }
+                } catch (e) {
+                  return 'Invalid date';
+                }
+
+                return null;
+              }),
+              _buildLabel("Gender"),
+              Row(
+                children: [
+                  _genderButton("Male", isMaleSelected, () {
+                    setState(() {
+                      isMaleSelected = true;
+                    });
+                  }),
+                  SizedBox(width: 10),
+                  _genderButton("Female", !isMaleSelected, () {
+                    setState(() {
+                      isMaleSelected = false;
+                    });
+                  }),
                 ],
               ),
-            ),
-            SizedBox(height: 20),
-            _buildLabel("Name"),
-            _buildTextField(nameController, "Enter your name", nameFocusNode),
-            _buildLabel("Email"),
-            TextField(
-              controller: TextEditingController(text: email),
-              readOnly: true,
-              decoration: InputDecoration(
-                contentPadding:
-                    EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                border:
-                    OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                filled: true,
-                fillColor: Colors.grey[300],
-              ),
-            ),
-            _buildLabel("Phone Number"),
-            _buildTextField(
-                phoneController, "Enter phone number", phoneFocusNode),
-            _buildLabel("Date of Birth"),
-            _buildTextField(
-                dobController, "Enter your date of birth", dobFocusNode),
-            _buildLabel("Gender"),
-            Row(
-              children: [
-                _genderButton("Male", isMaleSelected, () {
-                  setState(() {
-                    isMaleSelected = true;
-                  });
-                }),
-                SizedBox(width: 10),
-                _genderButton("Female", !isMaleSelected, () {
-                  setState(() {
-                    isMaleSelected = false;
-                  });
-                }),
-              ],
-            ),
-            SizedBox(height: 30),
-            Center(
-              child: ElevatedButton(
-                onPressed: _saveUserData,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFF0B5739),
-                  padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10)),
+              SizedBox(height: 30),
+              Center(
+                child: ElevatedButton(
+                  onPressed: _saveUserData,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color(0xFF0B5739),
+                    padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
+                  ),
+                  child: Text("Save",
+                      style: TextStyle(fontSize: 16, color: Colors.white)),
                 ),
-                child: Text("Save",
-                    style: TextStyle(fontSize: 16, color: Colors.white)),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -269,9 +323,10 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildTextField(
-      TextEditingController controller, String hintText, FocusNode focusNode) {
-    return TextField(
+  Widget _buildTextField(TextEditingController controller, String hintText,
+      FocusNode focusNode,
+      {String? Function(String?)? validator}) {
+    return TextFormField(
       controller: controller,
       focusNode: focusNode,
       decoration: InputDecoration(
@@ -288,6 +343,7 @@ class _ProfilePageState extends State<ProfilePage> {
         filled: true,
         fillColor: Colors.white,
       ),
+      validator: validator,
     );
   }
 
