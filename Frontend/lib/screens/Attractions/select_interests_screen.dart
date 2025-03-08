@@ -23,7 +23,7 @@ class _SelectInterestsScreenState extends State<SelectInterestsScreen> {
     "Spiritual Journeys",
     "Historical Tours",
     "Wildlife Safari",
-    "Traditional Arts & Crafts"
+    //"Traditional Arts & Crafts"
   ];
 
   final List<String> selectedInterests = [];
