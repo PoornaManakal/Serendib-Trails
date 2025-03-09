@@ -351,6 +351,26 @@ class TripsList extends StatelessWidget {
                                           ),
                                         ),
                                       ),
+                                      Positioned(
+                                        bottom: 8,
+                                        right: 8,
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            color:
+                                                Colors.white.withOpacity(0.8),
+                                            borderRadius:
+                                                BorderRadius.circular(50),
+                                          ),
+                                          child: IconButton(
+                                            icon: Icon(Icons.map_outlined,
+                                                color: Colors.black),
+                                            onPressed: () {
+                                              // Handle edit action
+                                              
+                                            },
+                                          ),
+                                        ),
+                                      ),
                                     ],
                                   ),
                                   Padding(
