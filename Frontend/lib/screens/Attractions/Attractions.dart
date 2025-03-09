@@ -3,6 +3,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:geolocator/geolocator.dart';
+import 'package:serendib_trails/screens/main_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -464,8 +465,9 @@ class _AttractionsScreenState extends State<AttractionsScreen> {
                     padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
                     child: ElevatedButton(
                       onPressed: () {
-                        if(suggestedPlaces.isNotEmpty) {
+                        if(suggestedPlaces.isNotEmpty) {                         
                           _saveTripToFirebase();
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => MainScreen()));
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(content: Text('No places found to save.')),
