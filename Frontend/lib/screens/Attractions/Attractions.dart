@@ -1,3 +1,4 @@
+//show all the saved data
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:convert';
@@ -262,15 +263,10 @@ class _AttractionsScreenState extends State<AttractionsScreen> {
     }
   }
 
-  // Navigate to TravelMapPage
   void _navigateToMap() {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => TravelMapPage(
-          suggestedPlaces: suggestedPlaces, // Pass selected places to TravelMapPage
-        ),
-      ),
+      MaterialPageRoute(builder: (context) => TravelMapPage()),
     );
   }
 
@@ -290,7 +286,8 @@ class _AttractionsScreenState extends State<AttractionsScreen> {
       child: Scaffold(
         appBar: AppBar(
           title: Text('Nearby Attractions',
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              style:
+                  TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
           backgroundColor: Color(0xFF0B5739),
           elevation: 0,
           leading: IconButton(
@@ -385,7 +382,8 @@ class _AttractionsScreenState extends State<AttractionsScreen> {
                         List<dynamic>? places = suggestedPlaces[interest];
 
                         return Card(
-                          margin: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                          margin: EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 15),
                           elevation: 5,
                           child: ExpansionTile(
                             title: Text(interest),
@@ -402,7 +400,8 @@ class _AttractionsScreenState extends State<AttractionsScreen> {
                                         margin: EdgeInsets.all(10),
                                         elevation: 5,
                                         child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
                                             // Display the image (if available)
                                             place["photos"] != null &&
@@ -416,7 +415,8 @@ class _AttractionsScreenState extends State<AttractionsScreen> {
                                                 : Container(), // If no image available, display nothing
 
                                             Padding(
-                                              padding: const EdgeInsets.all(8.0),
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
                                               child: Column(
                                                 crossAxisAlignment:
                                                     CrossAxisAlignment.start,
@@ -431,22 +431,26 @@ class _AttractionsScreenState extends State<AttractionsScreen> {
                                                   ),
                                                   SizedBox(height: 5),
                                                   Text(
-                                                    place["vicinity"] ?? "No address",
-                                                    style: TextStyle(fontSize: 14),
+                                                    place["vicinity"] ?? 
+                                                        "No address",
+                                                    style:
+                                                        TextStyle(fontSize: 14),
                                                   ),
                                                   SizedBox(height: 5),
                                                   Row(
                                                     children: [
                                                       Text(
                                                         "Rating: ",
-                                                        style: TextStyle(fontSize: 14),
+                                                        style: TextStyle(
+                                                            fontSize: 14),
                                                       ),
                                                       Icon(Icons.star,
                                                           color: Colors.amber,
                                                           size: 16),
                                                       Text(
                                                         " ${place["rating"]?.toString() ?? 'N/A'}",
-                                                        style: TextStyle(fontSize: 14),
+                                                        style: TextStyle(
+                                                            fontSize: 14),
                                                       ),
                                                     ],
                                                   ),
@@ -467,7 +471,7 @@ class _AttractionsScreenState extends State<AttractionsScreen> {
                     padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
                     child: ElevatedButton(
                       onPressed: () {
-                        if (suggestedPlaces.isNotEmpty) {
+                        if(suggestedPlaces.isNotEmpty) {
                           _saveTripToFirebase();
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -480,11 +484,13 @@ class _AttractionsScreenState extends State<AttractionsScreen> {
                         backgroundColor: Color(0xFF0B5739), // Button color
                         foregroundColor: Colors.white, // Text color
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30)), // Border radius
+                            borderRadius:
+                                BorderRadius.circular(30)), // Border radius
                         minimumSize: Size(300, 60),
                         padding: EdgeInsets.symmetric(vertical: 15.0),
                         textStyle: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold), // Bold text
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold), // Bold text
                       ),
                     ),
                   ),
@@ -501,7 +507,8 @@ class _AttractionsScreenState extends State<AttractionsScreen> {
                         minimumSize: Size(300, 60),
                         padding: EdgeInsets.symmetric(vertical: 15.0),
                         textStyle: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold), // Bold text
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold), // Bold text
                       ),
                     ),
                   ),
@@ -511,7 +518,6 @@ class _AttractionsScreenState extends State<AttractionsScreen> {
     );
   }
 }
-
 
 //original
 // import 'package:flutter/material.dart';
