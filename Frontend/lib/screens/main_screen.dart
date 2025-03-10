@@ -5,6 +5,7 @@ import 'package:serendib_trails/screens/Favourites/Favourites.dart';
 import 'package:serendib_trails/screens/Home.dart';
 import 'package:serendib_trails/screens/SettingPage/setting.dart';
 import 'package:serendib_trails/screens/Attractions/select_interests_screen.dart';
+import 'package:serendib_trails/screens/Transportation/Transportation.dart';
 import 'package:serendib_trails/widgets/nav_bar.dart';
 
 class MainScreen extends StatefulWidget {
@@ -29,7 +30,7 @@ class _MainScreenState extends State<MainScreen> {
     HomeScreen(),
     AccommodationScreen(),
     SelectInterestsScreen(),
-    BucketListPage(),
+    TransportationScreen(),
     SettingScreen(),
   ];
 

@@ -5,6 +5,8 @@ import 'dart:convert';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class TransportationFinderApp extends StatelessWidget {
   @override
@@ -215,88 +217,159 @@ class _TransportationScreenState extends State<TransportationScreen> {
                       child: CircularProgressIndicator(
                           valueColor:
                               AlwaysStoppedAnimation(Color(0xFF0B5739))))
-                  : ListView.builder(
-                      itemCount: transportations.length > 5
-                          ? 5
-                          : transportations.length,
-                      itemBuilder: (context, index) {
-                        final place = transportations[index];
-                        final name = place['name'];
-                        final rating =
-                            place['rating']?.toString() ?? 'No Rating';
-                        final lat = place['geometry']['location']['lat'];
-                        final lng = place['geometry']['location']['lng'];
+                  : transportations.isEmpty
+                      ? Center(child: Text("No transportations found"))
+                      : ListView.builder(
+                          itemCount: transportations.length > 5
+                              ? 5
+                              : transportations.length,
+                          itemBuilder: (context, index) {
+                            final place = transportations[index];
+                            final name = place['name'];
+                            final rating =
+                                place['rating']?.toString() ?? 'No Rating';
+                            final lat = place['geometry']['location']['lat'];
+                            final lng = place['geometry']['location']['lng'];
 
-                        return Card(
-                          margin: EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 15),
-                          elevation: 5,
-                          child: GestureDetector(
-                            onTap: () {
-                              String placeId = place["place_id"];
-                              String placeName = place["name"];
-                              _openInGoogleMaps(placeName, placeId);
-                            },
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // Display the image (if available)
-                                place["photos"] != null &&
-                                        place["photos"].isNotEmpty
-                                    ? Image.network(
-                                        "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${place["photos"][0]["photo_reference"]}&key=$apiKey",
-                                        fit: BoxFit.cover,
-                                        height: 180,
-                                        width: double.infinity,
-                                      )
-                                    : Container(), // If no image available, display nothing
-
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        place["name"] ?? "No name",
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 18,
+                            return Card(
+                              margin: EdgeInsets.symmetric(
+                                  vertical: 10, horizontal: 15),
+                              elevation: 5,
+                              child: GestureDetector(
+                                onTap: () {
+                                  String placeId = place["place_id"];
+                                  String placeName = place["name"];
+                                  _openInGoogleMaps(placeName, placeId);
+                                },
+                                child: Stack(
+                                  children: [
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        // Display the image (if available)
+                                        place["photos"] != null &&
+                                                place["photos"].isNotEmpty
+                                            ? Image.network(
+                                                "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${place["photos"][0]["photo_reference"]}&key=$apiKey",
+                                                fit: BoxFit.cover,
+                                                height: 180,
+                                                width: double.infinity,
+                                              )
+                                            : Container(), // If no image available, display nothing
+                                        Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                place["name"] ?? "No name",
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 18,
+                                                ),
+                                              ),
+                                              SizedBox(height: 5),
+                                              Text(
+                                                place["vicinity"] ??
+                                                    "No address",
+                                                style: TextStyle(fontSize: 14),
+                                              ),
+                                              SizedBox(height: 5),
+                                              Row(
+                                                children: [
+                                                  Text(
+                                                    "Rating: ",
+                                                    style: TextStyle(
+                                                        fontSize: 14),
+                                                  ),
+                                                  Icon(Icons.star,
+                                                      color: Colors.amber,
+                                                      size: 16),
+                                                  Text(
+                                                    " ${place["rating"]?.toString() ?? 'N/A'}",
+                                                    style: TextStyle(
+                                                        fontSize: 14),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    Positioned(
+                                      top: 8,
+                                      right: 8,
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: Colors.white.withOpacity(0.8),
+                                          borderRadius:
+                                              BorderRadius.circular(50),
+                                        ),
+                                        child: IconButton(
+                                          icon: Icon(Icons.bookmark_border,
+                                              color: Colors.black),
+                                          onPressed: () {
+                                            _saveFavoriteTransportation(
+                                                context, place);
+                                          },
                                         ),
                                       ),
-                                      SizedBox(height: 5),
-                                      Text(
-                                        place["vicinity"] ?? "No address",
-                                        style: TextStyle(fontSize: 14),
-                                      ),
-                                      SizedBox(height: 5),
-                                      Row(
-                                        children: [
-                                          Text(
-                                            "Rating: ",
-                                            style: TextStyle(fontSize: 14),
-                                          ),
-                                          Icon(Icons.star,
-                                              color: Colors.amber, size: 16),
-                                          Text(
-                                            " ${place["rating"]?.toString() ?? 'N/A'}",
-                                            style: TextStyle(fontSize: 14),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                    ),
+                              ),
+                            );
+                          },
+                        ),
             ),
           ],
         ),
       ),
     );
+  }
+
+  Future<void> _saveFavoriteTransportation(BuildContext context, Map<String, dynamic> place) async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      final userId = user.uid;
+      final placeId = place['place_id'];
+
+      // Check if the place already exists in the favourite_accommodations collection for the current user
+      final querySnapshot = await FirebaseFirestore.instance
+          .collection('favourite_transportations')
+          .where('userId', isEqualTo: userId)
+          .where('placeId', isEqualTo: placeId)
+          .get();
+
+      if (querySnapshot.docs.isEmpty) {
+        // Place does not exist, add it to the collection
+        await FirebaseFirestore.instance.collection('favourite_transportations').add({
+          'userId': userId,
+          'placeId': placeId,
+          'name': place['name'],
+          'vicinity': place['vicinity'],
+          'rating': place['rating'],
+          'photoUrl': place['photos'] != null && place['photos'].isNotEmpty
+              ? "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${place['photos'][0]['photo_reference']}&key=$apiKey"
+              : null,
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Place added to favourites'), backgroundColor: Colors.green),
+        );
+      } else {
+        // Place already exists, show a message or handle accordingly
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Place already added to favourites'), backgroundColor: Colors.orange),
+        );
+        print('Place already added to favourites');
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('User not logged in.')),
+      );
+    }
   }
 }
