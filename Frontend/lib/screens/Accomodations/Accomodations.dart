@@ -319,6 +319,7 @@
 
 
 
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:serendib_trails/screens/main_screen.dart';
@@ -514,98 +515,100 @@ class _AccommodationScreenState extends State<AccommodationScreen> {
             Expanded(
               child: isLoading
                   ? Center(child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation(Color(0xFF0B5739))))
-                  : ListView.builder(
-                      itemCount: accommodations.length > 5 ? 5 : accommodations.length,
-                      itemBuilder: (context, index) {
-                        final place = accommodations[index];
-                        final name = place['name'];
-                        final rating = place['rating']?.toString() ?? 'No Rating';
-                        final lat = place['geometry']['location']['lat'];
-                        final lng = place['geometry']['location']['lng'];
+                  : accommodations.isEmpty
+                      ? Center(child: Text("No accommodations found"))
+                      : ListView.builder(
+                          itemCount: accommodations.length > 5 ? 5 : accommodations.length,
+                          itemBuilder: (context, index) {
+                            final place = accommodations[index];
+                            final name = place['name'];
+                            final rating = place['rating']?.toString() ?? 'No Rating';
+                            final lat = place['geometry']['location']['lat'];
+                            final lng = place['geometry']['location']['lng'];
 
-                        return Card(
-                          margin: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-                          elevation: 5,
-                          child: GestureDetector(
-                            onTap: () {
-                              String placeId = place["place_id"];
-                              String placeName = place["name"];
-                              _openInGoogleMaps(placeName, placeId);
-                            },
-                            child: Stack(
-                              children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                            return Card(
+                              margin: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                              elevation: 5,
+                              child: GestureDetector(
+                                onTap: () {
+                                  String placeId = place["place_id"];
+                                  String placeName = place["name"];
+                                  _openInGoogleMaps(placeName, placeId);
+                                },
+                                child: Stack(
                                   children: [
-                                    // Display the image (if available)
-                                    place["photos"] != null && place["photos"].isNotEmpty
-                                        ? Image.network(
-                                            "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${place["photos"][0]["photo_reference"]}&key=$apiKey",
-                                            fit: BoxFit.cover,
-                                            height: 180,
-                                            width: double.infinity,
-                                          )
-                                        : Container(), // If no image available, display nothing
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            place["name"] ?? "No name",
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 18,
-                                            ),
-                                          ),
-                                          SizedBox(height: 5),
-                                          Text(
-                                            place["vicinity"] ?? "No address",
-                                            style: TextStyle(fontSize: 14),
-                                          ),
-                                          SizedBox(height: 5),
-                                          Row(
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        // Display the image (if available)
+                                        place["photos"] != null && place["photos"].isNotEmpty
+                                            ? Image.network(
+                                                "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${place["photos"][0]["photo_reference"]}&key=$apiKey",
+                                                fit: BoxFit.cover,
+                                                height: 180,
+                                                width: double.infinity,
+                                              )
+                                            : Container(), // If no image available, display nothing
+                                        Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                                "Rating: ",
+                                                place["name"] ?? "No name",
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 18,
+                                                ),
+                                              ),
+                                              SizedBox(height: 5),
+                                              Text(
+                                                place["vicinity"] ?? "No address",
                                                 style: TextStyle(fontSize: 14),
                                               ),
-                                              Icon(Icons.star,
-                                                  color: Colors.amber, size: 16),
-                                              Text(
-                                                " ${place["rating"]?.toString() ?? 'N/A'}",
-                                                style: TextStyle(fontSize: 14),
+                                              SizedBox(height: 5),
+                                              Row(
+                                                children: [
+                                                  Text(
+                                                    "Rating: ",
+                                                    style: TextStyle(fontSize: 14),
+                                                  ),
+                                                  Icon(Icons.star,
+                                                      color: Colors.amber, size: 16),
+                                                  Text(
+                                                    " ${place["rating"]?.toString() ?? 'N/A'}",
+                                                    style: TextStyle(fontSize: 14),
+                                                  ),
+                                                ],
                                               ),
                                             ],
                                           ),
-                                        ],
+                                        ),
+                                      ],
+                                    ),
+                                    Positioned(
+                                      top: 8,
+                                      right: 8,
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: Colors.white.withOpacity(0.8),
+                                          borderRadius: BorderRadius.circular(50),
+                                        ),
+                                        child: IconButton(
+                                          icon: Icon(Icons.bookmark_border,
+                                              color: Colors.black),
+                                          onPressed: () {
+                                            _saveFavoriteAccommodation(context, place);
+                                          },
+                                        ),
                                       ),
                                     ),
                                   ],
                                 ),
-                                Positioned(
-                                  top: 8,
-                                  right: 8,
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: Colors.white.withOpacity(0.8),
-                                      borderRadius: BorderRadius.circular(50),
-                                    ),
-                                    child: IconButton(
-                                      icon: Icon(Icons.bookmark_border,
-                                          color: Colors.black),
-                                      onPressed: () {
-                                        _saveFavoriteAccommodation(context, place);
-                                      },
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                    ),
+                              ),
+                            );
+                          },
+                        ),
             ),
           ],
         ),
@@ -613,14 +616,13 @@ class _AccommodationScreenState extends State<AccommodationScreen> {
     );
   }
 
-
   Future<void> _saveFavoriteAccommodation(BuildContext context, Map<String, dynamic> place) async {
     User? user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       final userId = user.uid;
       final placeId = place['place_id'];
 
-      // Check if the place already exists in the favourite_places collection for the current user
+      // Check if the place already exists in the favourite_accommodations collection for the current user
       final querySnapshot = await FirebaseFirestore.instance
           .collection('favourite_accommodations')
           .where('userId', isEqualTo: userId)
