@@ -136,6 +136,24 @@ class _ArviewFor3dObjectsState extends State<ArviewFor3dObjects> {
       }
   }
 
+  Future<void>remove3DObject() async
+  {
+    allAnchors.forEach((each3dobject)
+    {
+      anchorManagerAR!.removeAnchor(each3dobject);
+    });
+
+    allAnchors = [];
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+
+    sessionManagerAR!.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -149,6 +167,30 @@ class _ArviewFor3dObjectsState extends State<ArviewFor3dObjects> {
           ARView(
             planeDetectionConfig: PlaneDetectionConfig.horizontalAndVertical,
             onARViewCreated: createARView,
+          ),
+
+          Padding(
+            padding: const EdgeInsets.all(17),
+            child: Align(
+              alignment: Alignment.bottomRight,
+              child: MaterialButton(
+                  onPressed: ()
+              {
+                remove3DObject();
+              },
+                color: Colors.white,
+                height: 35,
+                minWidth: 41,
+                padding: const EdgeInsets.all(0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(17)
+                ),
+                child: const Icon(Icons.cleaning_services_rounded, color: Colors.black,),
+
+
+            ),
+          ),
+
           ),
         ],
       )
