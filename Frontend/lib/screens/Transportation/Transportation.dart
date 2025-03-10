@@ -220,8 +220,8 @@ class _TransportationScreenState extends State<TransportationScreen> {
                   : transportations.isEmpty
                       ? Center(child: Text("No transportations found"))
                       : ListView.builder(
-                          itemCount: transportations.length > 5
-                              ? 5
+                          itemCount: transportations.length > 10
+                              ? 10
                               : transportations.length,
                           itemBuilder: (context, index) {
                             final place = transportations[index];

@@ -518,7 +518,7 @@ class _AccommodationScreenState extends State<AccommodationScreen> {
                   : accommodations.isEmpty
                       ? Center(child: Text("No accommodations found"))
                       : ListView.builder(
-                          itemCount: accommodations.length > 5 ? 5 : accommodations.length,
+                          itemCount: accommodations.length > 10 ? 10 : accommodations.length,
                           itemBuilder: (context, index) {
                             final place = accommodations[index];
                             final name = place['name'];
