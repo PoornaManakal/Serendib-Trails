@@ -27,6 +27,20 @@ class _FavouritesScreenState extends State<FavouritesScreen> with SingleTickerPr
     super.dispose();
   }
 
+  void _openInGoogleMaps(BuildContext context, String placeName, String placeId) async {
+    String encodedPlaceName = Uri.encodeComponent(placeName);
+    String googleMapsUrl =
+        "https://www.google.com/maps/search/?api=1&query=$encodedPlaceName&query_place_id=$placeId";
+
+    if (await canLaunchUrl(Uri.parse(googleMapsUrl))) {
+      await launchUrl(Uri.parse(googleMapsUrl));
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Could not open Google Maps.')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -84,8 +98,8 @@ class _FavouritesScreenState extends State<FavouritesScreen> with SingleTickerPr
           controller: _tabController,
           children: [
             TripsTab(),
-            AttractionsTab(),
-            Center(child: Text("Accommodations Content Here")),
+            AttractionsTab(openInGoogleMaps: _openInGoogleMaps),
+            AccommodationsTab(openInGoogleMaps: _openInGoogleMaps),
             Center(child: Text("Transportations Content Here")),
           ],
         ),
@@ -95,6 +109,7 @@ class _FavouritesScreenState extends State<FavouritesScreen> with SingleTickerPr
 }
 
 class TripsTab extends StatelessWidget {
+  
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
@@ -220,6 +235,10 @@ class TripsTab extends StatelessWidget {
 }
 
 class AttractionsTab extends StatelessWidget {
+  final void Function(BuildContext, String, String) openInGoogleMaps;
+
+  AttractionsTab({required this.openInGoogleMaps});
+
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
@@ -321,7 +340,7 @@ class AttractionsTab extends StatelessWidget {
                           Center(
                             child: ElevatedButton(
                               onPressed: () {
-                                _openInGoogleMaps(context, place['name'], place['placeId']);
+                                openInGoogleMaps(context, place['name'], place['placeId']);
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Color(0xFF0B5739),
@@ -350,18 +369,141 @@ class AttractionsTab extends StatelessWidget {
   Future<void> _removeFavoritePlace(BuildContext context, String placeId) async {
     await FirebaseFirestore.instance.collection('favourite_places').doc(placeId).delete();
   }
+}
 
-  void _openInGoogleMaps(BuildContext context, String placeName, String placeId) async {
-    String encodedPlaceName = Uri.encodeComponent(placeName);
-    String googleMapsUrl =
-        "https://www.google.com/maps/search/?api=1&query=$encodedPlaceName&query_place_id=$placeId";
+class AccommodationsTab extends StatelessWidget {
+  final void Function(BuildContext, String, String) openInGoogleMaps;
 
-    if (await canLaunchUrl(Uri.parse(googleMapsUrl))) {
-      await launchUrl(Uri.parse(googleMapsUrl));
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Could not open Google Maps.')),
-      );
+  AccommodationsTab({required this.openInGoogleMaps});
+
+  @override
+  Widget build(BuildContext context) {
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) {
+      return Center(child: Text("Please log in to see your favorite accommodations."));
     }
+
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('favourite_accommodations')
+          .where('userId', isEqualTo: user.uid)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        }
+        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          return Center(child: Text("No favourite accommodations found"));
+        }
+        final accommodations = snapshot.data!.docs;
+        return ListView.builder(
+          itemCount: accommodations.length,
+          itemBuilder: (context, index) {
+            final accommodation = accommodations[index].data() as Map<String, dynamic>;
+            final accommodationId = accommodations[index].id;
+            final photoUrl = accommodation['photoUrl'] as String?;
+            return Card(
+              margin: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+              elevation: 5,
+              child: GestureDetector(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Stack(
+                      children: [
+                        // Display the image (if available)
+                        photoUrl != null
+                            ? Image.network(
+                                photoUrl,
+                                fit: BoxFit.cover,
+                                height: 180,
+                                width: double.infinity,
+                              )
+                            : Container(
+                                height: 180,
+                                color: Colors.grey), // If no image available, display a grey container
+                        Positioned(
+                          top: 8,
+                          right: 8,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.8),
+                              borderRadius: BorderRadius.circular(50),
+                            ),
+                            child: IconButton(
+                              icon: Icon(Icons.bookmark, color: Colors.black),
+                              onPressed: () {
+                                // Handle bookmark action
+                                _removeFavoriteAccommodation(context, accommodationId);
+                              },
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            accommodation['name'] ?? "No name",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                            ),
+                          ),
+                          SizedBox(height: 5),
+                          Text(
+                            accommodation['vicinity'] ?? "No address",
+                            style: TextStyle(fontSize: 14),
+                          ),
+                          SizedBox(height: 5),
+                          Row(
+                            children: [
+                              Text(
+                                "Rating: ",
+                                style: TextStyle(fontSize: 14),
+                              ),
+                              Icon(Icons.star, color: Colors.amber, size: 16),
+                              Text(
+                                " ${accommodation['rating']?.toString() ?? 'N/A'}",
+                                style: TextStyle(fontSize: 14),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 5),
+                          Center(
+                            child: ElevatedButton(
+                              onPressed: () {
+                                openInGoogleMaps(context, accommodation['name'], accommodation['placeId']);
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Color(0xFF0B5739),
+                                foregroundColor: Colors.white,
+                                padding: EdgeInsets.symmetric(horizontal: 50, vertical: 8),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                              child: Text('View in Maps'),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Future<void> _removeFavoriteAccommodation(BuildContext context, String accommodationId) async {
+    await FirebaseFirestore.instance.collection('favourite_accommodations').doc(accommodationId).delete();
   }
 }
