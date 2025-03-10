@@ -108,7 +108,7 @@ class _FavouritesScreenState extends State<FavouritesScreen>
             TripsTab(),
             AttractionsTab(openInGoogleMaps: _openInGoogleMaps),
             AccommodationsTab(openInGoogleMaps: _openInGoogleMaps),
-            Center(child: Text("Transportations Content Here")),
+            TransportationTab(openInGoogleMaps: _openInGoogleMaps),
           ],
         ),
       ),
