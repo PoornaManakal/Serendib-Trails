@@ -1,4 +1,4 @@
-//not the full journey
+//perfect without total and cam
 import 'dart:ui' as ui;
 import 'dart:convert';
 import 'package:flutter/material.dart';
@@ -61,6 +61,9 @@ class _TravelMapPageState extends State<TravelMapPage> {
         print("❌ No route found!");
         return [];
       }
+
+      // Extract total distance
+      _totalDistance += data['routes'][0]['legs'][0]['distance']['value'] / 1000; // Convert meters to km
 
       // Extract polyline points
       String encodedPolyline = data['routes'][0]['overview_polyline']['points'];
@@ -183,7 +186,7 @@ class _TravelMapPageState extends State<TravelMapPage> {
       if (i > 0) {
         List<LatLng> roadRoute =
             await _getRouteCoordinates(routePoints[i - 1], routePoints[i]);
-        
+
         if (roadRoute.isNotEmpty) {
           _polylines.add(
             Polyline(
@@ -200,19 +203,31 @@ class _TravelMapPageState extends State<TravelMapPage> {
       }
     }
 
-    setState(() {});
-
-    if (sortedPlaces.isNotEmpty && !_isMapInitialized) {
-      Future.delayed(Duration(milliseconds: 500), () {
-        _mapController.animateCamera(
-          CameraUpdate.newLatLngZoom(_firstPlace, 15),
+    // ✅ Last route to the final place
+    if (routePoints.length > 1) {
+      List<LatLng> finalRoute =
+          await _getRouteCoordinates(routePoints[routePoints.length - 2], routePoints.last);
+      
+      if (finalRoute.isNotEmpty) {
+        _polylines.add(
+          Polyline(
+            polylineId: PolylineId("final_route"),
+            points: finalRoute,
+            color: Colors.red,
+            width: 5,
+            startCap: Cap.roundCap,
+            endCap: Cap.roundCap,
+            jointType: JointType.round,
+          ),
         );
-        _isMapInitialized = true;
-      });
+      }
     }
+
+    setState(() {});
   }
 
-  Future<BitmapDescriptor> _createNumberedMarker(int number) async {
+
+Future<BitmapDescriptor> _createNumberedMarker(int number) async {
   final ui.PictureRecorder pictureRecorder = ui.PictureRecorder();
   final Canvas canvas = Canvas(pictureRecorder);
   final Paint paint = Paint()..color = Colors.red;
@@ -257,13 +272,16 @@ class _TravelMapPageState extends State<TravelMapPage> {
   return BitmapDescriptor.fromBytes(data!.buffer.asUint8List());
 }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text("Travel Map", style: TextStyle(color: Colors.white)),
         backgroundColor: Color(0xFF0B5739),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
       body: Stack(
         children: [
@@ -280,14 +298,4 @@ class _TravelMapPageState extends State<TravelMapPage> {
     );
   }
 }
-
-
-
-
-
-
-
-
-
-
 
