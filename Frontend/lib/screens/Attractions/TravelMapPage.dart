@@ -1,4 +1,3 @@
-//perfect without total and cam
 import 'dart:ui' as ui;
 import 'dart:convert';
 import 'package:flutter/material.dart';
@@ -25,7 +24,7 @@ class _TravelMapPageState extends State<TravelMapPage> {
   bool _isMapInitialized = false;
   LatLng _firstPlace = LatLng(6.9271, 79.8612); // Default: Colombo, Sri Lanka
   double _totalDistance = 0.0;
-  final String apiKey = dotenv.env['GOOGLE_MAPS_API_KEY'] ?? ""; // Load API Key
+  final String apiKey = dotenv.env['GOOGLE_MAPS_API_KEY'] ?? ""; 
 
   @override
   void initState() {
@@ -33,7 +32,7 @@ class _TravelMapPageState extends State<TravelMapPage> {
     _getCurrentLocation();
   }
 
-  // 📍 Get Current Location
+  // Get Current Location
   Future<void> _getCurrentLocation() async {
     Position position = await Geolocator.getCurrentPosition(
       desiredAccuracy: LocationAccuracy.best,
@@ -46,21 +45,16 @@ class _TravelMapPageState extends State<TravelMapPage> {
     _sortAndAddMarkers();
   }
 
-  // 🛣️ Fetch Google Directions API Route
+  // Fetch Google Directions API Route
   Future<List<LatLng>> _getRouteCoordinates(LatLng start, LatLng end) async {
     final String url =
         "https://maps.googleapis.com/maps/api/directions/json?origin=${start.latitude},${start.longitude}&destination=${end.latitude},${end.longitude}&key=$apiKey";
-
-    print("Fetching route: $url"); // 🔍 Debugging print
 
     final response = await http.get(Uri.parse(url));
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
 
-      if (data['routes'].isEmpty) {
-        print("❌ No route found!");
-        return [];
-      }
+      if (data['routes'].isEmpty) return [];
 
       // Extract total distance
       _totalDistance += data['routes'][0]['legs'][0]['distance']['value'] / 1000; // Convert meters to km
@@ -69,12 +63,11 @@ class _TravelMapPageState extends State<TravelMapPage> {
       String encodedPolyline = data['routes'][0]['overview_polyline']['points'];
       return _decodePolyline(encodedPolyline);
     } else {
-      print("❌ Error fetching route: ${response.body}");
       return [];
     }
   }
 
-  // 🔄 Decode Polyline into LatLng Points
+  // Decode Polyline into LatLng Points
   List<LatLng> _decodePolyline(String encoded) {
     List<LatLng> polylineCoordinates = [];
     List<int> polylinePoints = encoded.codeUnits;
@@ -106,7 +99,7 @@ class _TravelMapPageState extends State<TravelMapPage> {
     return polylineCoordinates;
   }
 
-  // 🏁 Find Best Route & Add Markers
+  // Find Best Route & Add Markers
   void _sortAndAddMarkers() async {
     if (_currentPosition == null) return;
 
@@ -182,7 +175,7 @@ class _TravelMapPageState extends State<TravelMapPage> {
         _firstPlace = LatLng(lat, lng);
       }
 
-      // ✅ Fetch actual road route
+      // Fetch actual road route
       if (i > 0) {
         List<LatLng> roadRoute =
             await _getRouteCoordinates(routePoints[i - 1], routePoints[i]);
@@ -203,17 +196,17 @@ class _TravelMapPageState extends State<TravelMapPage> {
       }
     }
 
-    // ✅ Last route to the final place
+    // Final route from last place to final destination
     if (routePoints.length > 1) {
-      List<LatLng> finalRoute =
-          await _getRouteCoordinates(routePoints[routePoints.length - 2], routePoints.last);
-      
+      List<LatLng> finalRoute = await _getRouteCoordinates(
+          routePoints[routePoints.length - 2], routePoints.last);
+
       if (finalRoute.isNotEmpty) {
         _polylines.add(
           Polyline(
             polylineId: PolylineId("final_route"),
             points: finalRoute,
-            color: Colors.red,
+            color: Colors.blue,
             width: 5,
             startCap: Cap.roundCap,
             endCap: Cap.roundCap,
@@ -223,11 +216,12 @@ class _TravelMapPageState extends State<TravelMapPage> {
       }
     }
 
-    setState(() {});
+    setState(() {
+      _mapController.animateCamera(CameraUpdate.newLatLngZoom(_firstPlace, 15));
+    });
   }
 
-
-Future<BitmapDescriptor> _createNumberedMarker(int number) async {
+  Future<BitmapDescriptor> _createNumberedMarker(int number) async {
   final ui.PictureRecorder pictureRecorder = ui.PictureRecorder();
   final Canvas canvas = Canvas(pictureRecorder);
   final Paint paint = Paint()..color = Colors.red;
@@ -272,6 +266,7 @@ Future<BitmapDescriptor> _createNumberedMarker(int number) async {
   return BitmapDescriptor.fromBytes(data!.buffer.asUint8List());
 }
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -293,9 +288,20 @@ Future<BitmapDescriptor> _createNumberedMarker(int number) async {
             markers: _markers,
             polylines: _polylines,
           ),
+          Positioned(
+            top: 10,
+            right: 10,
+            child: Container(
+              padding: EdgeInsets.all(8),
+              color: Colors.white,
+              child: Text(
+                "Total Distance: ${_totalDistance.toStringAsFixed(2)} km",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
 }
-
