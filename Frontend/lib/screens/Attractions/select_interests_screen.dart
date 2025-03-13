@@ -11,7 +11,7 @@ class _SelectInterestsScreenState extends State<SelectInterestsScreen> {
   final List<String> interests = [
     "Culture",
     "Relaxation",
-    "Art",
+    //"Art",
     "Night Life",
     "Hiking",
     "Beach Side",
