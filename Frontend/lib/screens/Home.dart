@@ -370,11 +370,29 @@ class TripsList extends StatelessWidget {
                                               Navigator.push(
                                                 context,
                                                 MaterialPageRoute(
-                                                  builder: (context) => TravelMapPage(
-                                                    suggestedPlaces: trip['suggestedPlaces'],  // Pass the suggested places
-                                                  ),
+                                                  builder: (context) {
+                                                    // Ensure suggestedPlaces is in the correct format (Map<String, List<dynamic>>)
+                                                    Map<String, List<dynamic>> formattedPlaces = {};
+                                                    
+                                                    final suggestedPlaces = trip['suggestedPlaces'];
+                                                    
+                                                    if (suggestedPlaces is Map<String, dynamic>) {
+                                                      // Convert each category's value to a list
+                                                      suggestedPlaces.forEach((category, value) {
+                                                        if (value is List) {
+                                                          formattedPlaces[category] = List<dynamic>.from(value);
+                                                        } else {
+                                                          formattedPlaces[category] = [];
+                                                        }
+                                                      });
+                                                    }
+
+                                                    return TravelMapPage(
+                                                      suggestedPlaces: formattedPlaces,  // Pass the correctly formatted places
+                                                    );
+                                                  },
                                                 ),
-                                              );                        
+                                              );     
                                             },
                                           ),
                                         ),
