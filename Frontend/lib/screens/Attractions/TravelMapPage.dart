@@ -185,7 +185,7 @@ class _TravelMapPageState extends State<TravelMapPage> {
             Polyline(
               polylineId: PolylineId("route_$i"),
               points: roadRoute,
-              color: Colors.blue,
+              color: Color(0xFF0B5739),
               width: 5,
               startCap: Cap.roundCap,
               endCap: Cap.roundCap,
@@ -206,7 +206,7 @@ class _TravelMapPageState extends State<TravelMapPage> {
           Polyline(
             polylineId: PolylineId("final_route"),
             points: finalRoute,
-            color: Colors.blue,
+            color: Color(0xFF0B5739),
             width: 5,
             startCap: Cap.roundCap,
             endCap: Cap.roundCap,
