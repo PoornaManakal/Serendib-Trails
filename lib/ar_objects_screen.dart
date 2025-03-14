@@ -18,3 +18,43 @@ class ARObjectsScreen extends StatefulWidget {
   @override
   State<ARObjectsScreen> createState() => _ARObjectsScreenState();
 }
+
+class _ARObjectsScreenState extends State<ARObjectsScreen> {
+  late ARSessionManager arSessionManager;
+  late ARObjectManager arObjectManager;
+  ARNode? localObjectNode;
+  ARNode? webObjectNode;
+  bool isAdd = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      appBar: AppBar(),
+      body: ARView(onARViewCreated: onARViewCreated),
+      floatingActionButton: FloatingActionButton(
+        onPressed: widget.isLocal
+            ? onLocalObjectButtonPressed
+            : onWebObjectAtButtonPressed,
+        child: Icon(isAdd ? Icons.remove : Icons.add),
+      ),
+    );
+  }
+
+  void onARViewCreated(
+      ARSessionManager arSessionManager,
+      ARObjectManager arObjectManager,
+      ARAnchorManager arAnchorManager,
+      ARLocationManager arLocationManager) {
+    this.arSessionManager = arSessionManager;
+    this.arObjectManager = arObjectManager;
+
+    this.arSessionManager.onInitialize(
+      showFeaturePoints: false,
+      showPlanes: true,
+      customPlaneTexturePath: "assets/triangle.png",
+      showWorldOrigin: true,
+      handleTaps: false,
+    );
+    this.arObjectManager.onInitialize();
+  }
