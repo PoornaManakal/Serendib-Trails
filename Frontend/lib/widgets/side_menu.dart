@@ -50,6 +50,81 @@ class _SideMenuState extends State<SideMenu> {
     );
   }
 
+  Future<void> _confirmSignOut(BuildContext context) async {
+    final bool? shouldSignOut = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16), // Rounded corners for the dialog
+          ),
+          titlePadding: EdgeInsets.all(20), // Padding for title
+          title: Center(
+            child: Text(
+              'Are you sure you want to exit?',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          contentPadding: EdgeInsets.zero, // Remove extra spacing
+          actionsPadding: EdgeInsets.zero, // Align buttons to edges
+          actions: [
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.vertical(
+                    bottom: Radius.circular(16)), // Rounded bottom
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextButton(
+                      onPressed: () => Navigator.of(context).pop(false),
+                      style: TextButton.styleFrom(
+                        backgroundColor: Colors.grey.shade400, // Gray button
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.only(
+                            bottomLeft: Radius.circular(16), // Rounded left corner
+                          ),
+                        ),
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(vertical: 5), // Button height
+                        child: Text('No',
+                            style: TextStyle(color: Colors.white, fontSize: 16)),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: TextButton(
+                      onPressed: () => Navigator.of(context).pop(true),
+                      style: TextButton.styleFrom(
+                        backgroundColor: Color(0xFF0B5739),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.only(
+                            bottomRight: Radius.circular(16), // Rounded right corner
+                          ),
+                        ),
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(vertical: 5), // Button height
+                        child: Text('Yes',
+                            style: TextStyle(color: Colors.white, fontSize: 16)),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (shouldSignOut == true) {
+      await FirebaseAuth.instance.signOut();
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => SigninScreen()));
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -133,8 +208,7 @@ class _SideMenuState extends State<SideMenu> {
                     leading: Icon(Icons.logout, color: Colors.redAccent),
                     title: Text("Logout", style: TextStyle(color: Colors.redAccent)),
                     onTap: () async {
-                      await FirebaseAuth.instance.signOut();
-                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => SigninScreen()));
+                      await _confirmSignOut(context);
                     },
                   ),
                 ],
