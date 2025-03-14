@@ -171,7 +171,11 @@ class _MapPageState extends State<MapPage> {
           ),
           Positioned(
             left: 16,
+
+            top: 650, // Adjust this value as needed
+
             bottom: 16, // Positioned at the bottom for current location button
+
             child: FloatingActionButton(
               onPressed: _getCurrentLocation, // Get current location when the button is pressed
               backgroundColor: Color.fromARGB(255, 194, 230, 216),
