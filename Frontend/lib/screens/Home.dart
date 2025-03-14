@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:serendib_trails/screens/Login_Screens/SignIn_screen.dart';
 import 'package:serendib_trails/screens/Attractions/details.dart';
+import 'package:serendib_trails/screens/Attractions/TravelMapPage.dart'; 
 import 'package:serendib_trails/widgets/side_menu.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -364,9 +365,34 @@ class TripsList extends StatelessWidget {
                                           child: IconButton(
                                             icon: Icon(Icons.map_outlined,
                                                 color: Colors.black),
-                                            onPressed: () {
-                                              // Handle edit action
-                                              
+                                            onPressed: () {  
+                                              // When map icon is clicked, navigate to the TravelMapPage
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) {
+                                                    // Ensure suggestedPlaces is in the correct format (Map<String, List<dynamic>>)
+                                                    Map<String, List<dynamic>> formattedPlaces = {};
+                                                    
+                                                    final suggestedPlaces = trip['suggestedPlaces'];
+                                                    
+                                                    if (suggestedPlaces is Map<String, dynamic>) {
+                                                      // Convert each category's value to a list
+                                                      suggestedPlaces.forEach((category, value) {
+                                                        if (value is List) {
+                                                          formattedPlaces[category] = List<dynamic>.from(value);
+                                                        } else {
+                                                          formattedPlaces[category] = [];
+                                                        }
+                                                      });
+                                                    }
+
+                                                    return TravelMapPage(
+                                                      suggestedPlaces: formattedPlaces,  // Pass the correctly formatted places
+                                                    );
+                                                  },
+                                                ),
+                                              );     
                                             },
                                           ),
                                         ),
