@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:serendib_trails/screens/Login_Screens/SignIn_screen.dart';
 import 'package:serendib_trails/screens/Attractions/details.dart';
-import 'package:serendib_trails/screens/Attractions/TravelMapPage.dart'; 
+import 'package:serendib_trails/screens/Attractions/TravelMapPage.dart';
 import 'package:serendib_trails/widgets/side_menu.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -140,13 +140,23 @@ class _HomeScreenState extends State<HomeScreen>
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Text("Welcome, $userName!",
-              style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold)), // Display user's name
           backgroundColor: const Color(0xFF0B5739), // Green color
           iconTheme: IconThemeData(color: Colors.white),
-          actions: [
+          flexibleSpace: Stack(
+            children: [
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 20.0),
+                  child: Image.asset(
+                    'lib/assets/images/footer.png',
+                    height: 35,
+                    
+                  ),
+                ),
+              ),
+            ],
+          ),
+            actions: [
             IconButton(
               icon: Icon(Icons.logout, color: Colors.white),
               onPressed: () async {
@@ -365,34 +375,43 @@ class TripsList extends StatelessWidget {
                                           child: IconButton(
                                             icon: Icon(Icons.map_outlined,
                                                 color: Colors.black),
-                                            onPressed: () {  
+                                            onPressed: () {
                                               // When map icon is clicked, navigate to the TravelMapPage
                                               Navigator.push(
                                                 context,
                                                 MaterialPageRoute(
                                                   builder: (context) {
                                                     // Ensure suggestedPlaces is in the correct format (Map<String, List<dynamic>>)
-                                                    Map<String, List<dynamic>> formattedPlaces = {};
-                                                    
-                                                    final suggestedPlaces = trip['suggestedPlaces'];
-                                                    
-                                                    if (suggestedPlaces is Map<String, dynamic>) {
+                                                    Map<String, List<dynamic>>
+                                                        formattedPlaces = {};
+
+                                                    final suggestedPlaces =
+                                                        trip['suggestedPlaces'];
+
+                                                    if (suggestedPlaces is Map<
+                                                        String, dynamic>) {
                                                       // Convert each category's value to a list
-                                                      suggestedPlaces.forEach((category, value) {
+                                                      suggestedPlaces.forEach(
+                                                          (category, value) {
                                                         if (value is List) {
-                                                          formattedPlaces[category] = List<dynamic>.from(value);
+                                                          formattedPlaces[
+                                                              category] = List<
+                                                                  dynamic>.from(
+                                                              value);
                                                         } else {
-                                                          formattedPlaces[category] = [];
+                                                          formattedPlaces[
+                                                              category] = [];
                                                         }
                                                       });
                                                     }
 
                                                     return TravelMapPage(
-                                                      suggestedPlaces: formattedPlaces,  // Pass the correctly formatted places
+                                                      suggestedPlaces:
+                                                          formattedPlaces, // Pass the correctly formatted places
                                                     );
                                                   },
                                                 ),
-                                              );     
+                                              );
                                             },
                                           ),
                                         ),
