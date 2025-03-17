@@ -1,4 +1,5 @@
 import 'package:ar_flutter_plugin/ar_flutter_plugin.dart';
+import 'package:flutter/material.dart';
 import 'package:ar_flutter_plugin/datatypes/node_types.dart';
 import 'package:ar_flutter_plugin/managers/ar_anchor_manager.dart';
 import 'package:ar_flutter_plugin/managers/ar_location_manager.dart';
@@ -98,4 +99,12 @@ class _ARObjectsScreenState extends State<ARObjectsScreen> {
     arSessionManager.dispose();
     super.dispose();
   }
+}
+
+class AppColors {
+  static Color mainColor = Colors.deepPurple;
+  static Color background = const Color(0xfff6f7f9);
+  static Color black54 = Colors.black54;
+  static Color white = Colors.white;
+  static Color grey = Colors.grey;
 }
