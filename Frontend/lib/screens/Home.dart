@@ -2,9 +2,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:serendib_trails/screens/Attractions/select_interests_screen.dart';
+import 'package:serendib_trails/screens/Favourites/Favourites.dart';
 import 'package:serendib_trails/screens/Login_Screens/SignIn_screen.dart';
 import 'package:serendib_trails/screens/Attractions/details.dart';
 import 'package:serendib_trails/screens/Attractions/TravelMapPage.dart';
+import 'package:serendib_trails/screens/SettingPage/ProfilePage.dart';
+import 'package:serendib_trails/screens/SettingPage/setting.dart';
+import 'package:serendib_trails/screens/main_screen.dart';
 import 'package:serendib_trails/widgets/side_menu.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -142,7 +146,7 @@ class _HomeScreenState extends State<HomeScreen>
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: const Color(0xFF0B5739), // Green color
-          iconTheme: IconThemeData(color: Colors.white),
+          iconTheme: IconThemeData(color: Colors.white, size: 30.0),
           flexibleSpace: Stack(
             children: [
               Center(
@@ -151,22 +155,192 @@ class _HomeScreenState extends State<HomeScreen>
                   child: Image.asset(
                     'lib/assets/images/footer.png',
                     height: 35,
-                    
                   ),
                 ),
               ),
             ],
           ),
-            actions: [
-            IconButton(
-              icon: Icon(Icons.logout, color: Colors.white),
-              onPressed: () async {
-                await FirebaseAuth.instance.signOut(); // Sign out the user
-                Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const SigninScreen()));
-              },
+          actions: [
+            PopupMenuTheme(
+              data: PopupMenuThemeData(
+                color: Colors.white, // Background color of the popup menu
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8), // Rounded corners
+                ),
+              ),
+              child: PopupMenuButton<String>(
+                icon: Icon(Icons.more_vert, color: Colors.white, size: 30.0),
+                onSelected: (String result) {
+                  switch (result) {
+                    case 'Profile':
+                      // Navigate to Profile screen
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                ProfilePage()), // Replace with your Profile screen
+                      );
+                      break;
+                    case 'favourites':
+                      // Navigate to Favourites screen
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                FavouritesScreen()), // Replace with your Settings screen
+                      );
+                      break;
+
+                    case 'settings':
+                      // Navigate to Settings screen
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => MainScreen(
+                                  selectedIndex: 4,
+                                )), // Replace with your Settings screen
+                        (Route<dynamic> route) => false,
+                      );
+                      break;
+                    case 'Logout':
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(
+                                  16), // Rounded corners for the dialog
+                            ),
+                            titlePadding:
+                                EdgeInsets.all(20), // Padding for title
+                            title: Center(
+                              child: Text(
+                                'Are you sure you want to sign out?',
+                                style: TextStyle(
+                                    fontSize: 18, fontWeight: FontWeight.bold),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                            contentPadding:
+                                EdgeInsets.zero, // Remove extra spacing
+                            actionsPadding:
+                                EdgeInsets.zero, // Align buttons to edges
+                            actions: [
+                              Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.vertical(
+                                      bottom: Radius.circular(
+                                          16)), // Rounded bottom
+                                ),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: TextButton(
+                                        onPressed: () =>
+                                            Navigator.of(context).pop(false),
+                                        style: TextButton.styleFrom(
+                                          backgroundColor: Colors
+                                              .grey.shade400, // Gray button
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.only(
+                                              bottomLeft: Radius.circular(
+                                                  16), // Rounded left corner
+                                            ),
+                                          ),
+                                        ),
+                                        child: Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              vertical: 5), // Button height
+                                          child: Text('No',
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 16)),
+                                        ),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop(true);
+                                          FirebaseAuth.instance.signOut();
+                                          Navigator.pushAndRemoveUntil(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    SigninScreen()),
+                                            (Route<dynamic> route) => false,
+                                          );
+                                        },
+                                        style: TextButton.styleFrom(
+                                          backgroundColor: Color(0xFF0B5739),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.only(
+                                              bottomRight: Radius.circular(
+                                                  16), // Rounded right corner
+                                            ),
+                                          ),
+                                        ),
+                                        child: Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              vertical: 5), // Button height
+                                          child: Text('Yes',
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 16)),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                      break;
+                  }
+                },
+                itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                  const PopupMenuItem<String>(
+                    value: 'Profile',
+                    child: Text(
+                      'My Profile',
+                      style: TextStyle(
+                        color: Color(0xFF0B5739), // Text color
+                        fontSize: 16, // Text size
+                      ),
+                    ),
+                  ),
+                  const PopupMenuItem<String>(
+                    value: 'favourites',
+                    child: Text(
+                      'Favourites',
+                      style: TextStyle(
+                        color: Color(0xFF0B5739), // Text color
+                        fontSize: 16, // Text size
+                      ),
+                    ),
+                  ),
+                  const PopupMenuItem<String>(
+                    value: 'settings',
+                    child: Text('Settings',
+                        style: TextStyle(
+                          color: Color(0xFF0B5739), // Text color
+                          fontSize: 16,
+                        ) // Text size
+                        ),
+                  ),
+                  const PopupMenuItem<String>(
+                    value: 'Logout',
+                    child: Text('Logout',
+                    style: TextStyle(
+                      color: Colors.red, // Text color
+                      fontSize: 16, // Text size
+                    ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
           bottom: PreferredSize(
@@ -606,11 +780,10 @@ class WelcomeMessage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-              Image.asset(
-                'lib/assets/images/traveller.png',
-                height: 300, // Adjust the height as needed
-              ),
-            
+            Image.asset(
+              'lib/assets/images/traveller.png',
+              height: 300, // Adjust the height as needed
+            ),
             SizedBox(height: 20),
             Text(
               'Welcome to Serendib Trails!',
@@ -629,7 +802,8 @@ class WelcomeMessage extends StatelessWidget {
                 // Navigate to the Create Trip screen
                 Navigator.pushAndRemoveUntil(
                   context,
-                  MaterialPageRoute(builder: (context) => SelectInterestsScreen()), 
+                  MaterialPageRoute(
+                      builder: (context) => MainScreen(selectedIndex: 2)),
                   (Route<dynamic> route) => false,
                 );
               },
