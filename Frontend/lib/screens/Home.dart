@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:serendib_trails/screens/Attractions/select_interests_screen.dart';
 import 'package:serendib_trails/screens/Login_Screens/SignIn_screen.dart';
 import 'package:serendib_trails/screens/Attractions/details.dart';
 import 'package:serendib_trails/screens/Attractions/TravelMapPage.dart';
@@ -290,7 +291,7 @@ class TripsList extends StatelessWidget {
                         return Center(child: Text('Error: ${snapshot.error}'));
                       }
                       if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                        return Center(child: Text('No trips found.'));
+                        return WelcomeMessage();
                       }
                       final trips = snapshot.data!.docs;
                       return ListView.builder(
@@ -595,3 +596,56 @@ class TripsList extends StatelessWidget {
 }
 
 // bookmark section should be implemented
+
+class WelcomeMessage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+              Image.asset(
+                'lib/assets/images/traveller.png',
+                height: 300, // Adjust the height as needed
+              ),
+            
+            SizedBox(height: 20),
+            Text(
+              'Welcome to Serendib Trails!',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 10),
+            Text(
+              'Start your adventure by creating your first trip. Explore new places and enjoy your journey!',
+              style: TextStyle(fontSize: 16),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                // Navigate to the Create Trip screen
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => SelectInterestsScreen()), 
+                  (Route<dynamic> route) => false,
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xFF0B5739), // Button color
+                foregroundColor: Colors.white, // Text color
+                padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: Text('Create Trip'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
