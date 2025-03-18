@@ -61,7 +61,7 @@ class _SideMenuState extends State<SideMenu> {
           titlePadding: EdgeInsets.all(20), // Padding for title
           title: Center(
             child: Text(
-              'Are you sure you want to exit?',
+              'Are you sure you want to sign out?',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),
