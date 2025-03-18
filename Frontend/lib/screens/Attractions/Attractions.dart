@@ -3,6 +3,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:geolocator/geolocator.dart';
+import 'package:serendib_trails/screens/main_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -214,6 +215,14 @@ class _AttractionsScreenState extends State<AttractionsScreen> {
       );
     }
   }
+  void _deletePlace(String interest, Map<String, dynamic> place) {
+    setState(() {
+      suggestedPlaces[interest]?.remove(place);
+      if (suggestedPlaces[interest]?.isEmpty ?? true) {
+        suggestedPlaces.remove(interest);
+      }
+    });
+  }
 
   Future<void> _saveTripToFirebase() async {
     User? user = FirebaseAuth.instance.currentUser;
@@ -248,11 +257,22 @@ class _AttractionsScreenState extends State<AttractionsScreen> {
           'photoUrl': photoUrl, // Save the photo URL
         });
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Trip saved successfully!')),
+          SnackBar(
+              content: Text('Trip saved successfully!'),
+              backgroundColor: Colors.green),
         );
+
+        Future.delayed(Duration(seconds: 1), () {
+          Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => MainScreen()),
+              (Route<dynamic> route) => false);
+        });
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to save trip: $e')),
+          SnackBar(
+              content: Text('Failed to save trip: $e'),
+              backgroundColor: Colors.red),
         );
       }
     } else {
@@ -300,10 +320,10 @@ class _AttractionsScreenState extends State<AttractionsScreen> {
           ],
         ),
         body: _currentPosition == null
-            ? Center(child: CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(
-                          Color(0xFF0B5739)),
-            ))
+            ? Center(
+                child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF0B5739)),
+              ))
             : Column(
                 children: [
                   Padding(
@@ -396,17 +416,47 @@ class _AttractionsScreenState extends State<AttractionsScreen> {
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
-                                            // Display the image (if available)
-                                            place["photos"] != null &&
-                                                    place["photos"].isNotEmpty
-                                                ? Image.network(
-                                                    "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${place["photos"][0]["photo_reference"]}&key=$googleApiKey",
-                                                    fit: BoxFit.cover,
-                                                    height: 180,
-                                                    width: double.infinity,
-                                                  )
-                                                : Container(), // If no image available, display nothing
-
+                                            Stack(
+                                              children: [
+                                                // Display the image (if available)
+                                                place["photos"] != null &&
+                                                        place["photos"]
+                                                            .isNotEmpty
+                                                    ? Image.network(
+                                                        "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${place["photos"][0]["photo_reference"]}&key=$googleApiKey",
+                                                        fit: BoxFit.cover,
+                                                        height: 180,
+                                                        width: double.infinity,
+                                                      )
+                                                    : Container(
+                                                        height: 180,
+                                                        color: Colors.grey,
+                                                      ), // If no image available, display a grey container
+                                                Positioned(
+                                                  top: 8,
+                                                  left: 8,
+                                                  child: Container(
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.white
+                                                          .withOpacity(0.8),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              50),
+                                                    ),
+                                                    child: IconButton(
+                                                      icon: Icon(
+                                                          Icons.delete_outline,
+                                                          color: Colors.black),
+                                                      onPressed: () {
+                                                        // Handle delete action
+                                                        _deletePlace(
+                                                            interest, place);
+                                                      },
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
                                             Padding(
                                               padding:
                                                   const EdgeInsets.all(8.0),
@@ -464,7 +514,7 @@ class _AttractionsScreenState extends State<AttractionsScreen> {
                     padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
                     child: ElevatedButton(
                       onPressed: () {
-                        if(suggestedPlaces.isNotEmpty) {
+                        if (suggestedPlaces.isNotEmpty) {
                           _saveTripToFirebase();
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
