@@ -139,7 +139,8 @@ class _TransportationScreenState extends State<TransportationScreen> {
     String keyword;
     switch (selectedType) {
       case 'Tuk Tuk Rental':
-        keyword ='tuk tuk rental|tuktuk rental|tuk-tuk rental|three wheeler rental|three wheel rent';
+        keyword =
+            'tuk tuk rental|tuktuk rental|tuk-tuk rental|three wheeler rental|three wheel rent';
         break;
       case 'Scooter Rental':
         keyword = 'scooter rental';
@@ -406,7 +407,24 @@ class _TransportationScreenState extends State<TransportationScreen> {
                             valueColor:
                                 AlwaysStoppedAnimation(Color(0xFF0B5739))))
                     : transportations.isEmpty
-                        ? Center(child: Text("No transportations found"))
+                        ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Image.asset(
+                                  'lib/assets/images/biker.png', // Path to your image
+                                  height: 250, // Adjust the height as needed
+                                  width: 250, // Adjust the width as needed
+                                ),
+                                SizedBox(height: 20),
+                                Text(
+                                  "No transportations found",
+                                  style: TextStyle(
+                                      fontSize: 16, color: Colors.grey),
+                                ),
+                              ],
+                            ),
+                          )
                         : ListView.builder(
                             itemCount: transportations.length > 10
                                 ? 10

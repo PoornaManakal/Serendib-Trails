@@ -390,7 +390,24 @@ class _AccommodationScreenState extends State<AccommodationScreen> {
                             valueColor:
                                 AlwaysStoppedAnimation(Color(0xFF0B5739))))
                     : accommodations.isEmpty
-                        ? Center(child: Text("No accommodations found"))
+                        ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Image.asset(
+                                  'lib/assets/images/accom.png',
+                                  height: 250,
+                                  width: 250,
+                                ),
+                                SizedBox(height: 20),
+                                Text(
+                                  "No transportations found",
+                                  style: TextStyle(
+                                      fontSize: 16, color: Colors.grey),
+                                ),
+                              ],
+                            ),
+                          )
                         : ListView.builder(
                             itemCount: accommodations.length > 10
                                 ? 10
