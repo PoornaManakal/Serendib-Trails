@@ -27,9 +27,41 @@ class _TransportationScreenState extends State<TransportationScreen> {
   Position? _currentPosition;
   String selectedType = "Tuk Tuk Rental";
   List<Map<String, dynamic>> transportations = [];
+  List<dynamic> _autocompleteResults = [];
   bool isLoading = false;
 
   final String apiKey = dotenv.env['GOOGLE_MAPS_API_KEY'] ?? "";
+  final TextEditingController _locationController = TextEditingController();
+  final FocusNode _focusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode.addListener(() {
+      setState(() {});
+    });
+  }
+
+  Future<void> _getCurrentPositionAndFetchTransportations() async {
+    try {
+      setState(() {
+        isLoading = true;
+      });
+
+      await _getCurrentPosition();
+      if (_currentPosition != null) {
+        fetchTransportations(location: null);
+      }
+      _locationController.clear();
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to fetch current location: $e')),
+      );
+    }
+  }
 
   Future<void> _getCurrentPosition() async {
     bool serviceEnabled;
@@ -58,24 +90,56 @@ class _TransportationScreenState extends State<TransportationScreen> {
     setState(() {});
   }
 
-  Future<void> fetchTransportations() async {
+  Future<void> fetchTransportations({String? location}) async {
     setState(() {
       isLoading = true;
     });
 
-    await _getCurrentPosition();
-    if (_currentPosition == null) {
-      setState(() {
-        isLoading = false;
-      });
-      return;
+    double latitude;
+    double longitude;
+
+    if (location != null && location.isNotEmpty) {
+      String geocodingUrl =
+          "https://maps.googleapis.com/maps/api/geocode/json?address=${Uri.encodeComponent(location)}&key=$apiKey";
+
+      final response = await http.get(Uri.parse(geocodingUrl));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['results'].isNotEmpty) {
+          latitude = data['results'][0]['geometry']['location']['lat'];
+          longitude = data['results'][0]['geometry']['location']['lng'];
+        } else {
+          setState(() {
+            isLoading = false;
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Location not found.')),
+          );
+          return;
+        }
+      } else {
+        setState(() {
+          isLoading = false;
+        });
+        throw Exception("Failed to fetch location coordinates");
+      }
+    } else {
+      await _getCurrentPosition();
+      if (_currentPosition == null) {
+        setState(() {
+          isLoading = false;
+        });
+        return;
+      }
+      latitude = _currentPosition!.latitude;
+      longitude = _currentPosition!.longitude;
     }
 
     String keyword;
     switch (selectedType) {
       case 'Tuk Tuk Rental':
-        keyword =
-            'tuk tuk rental|tuktuk rental|tuk-tuk rental|three wheeler rental|three wheel rent';
+        keyword ='tuk tuk rental|tuktuk rental|tuk-tuk rental|three wheeler rental|three wheel rent';
         break;
       case 'Scooter Rental':
         keyword = 'scooter rental';
@@ -91,7 +155,7 @@ class _TransportationScreenState extends State<TransportationScreen> {
     }
 
     String url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?"
-        "location=${_currentPosition!.latitude},${_currentPosition!.longitude}"
+        "location=$latitude,$longitude"
         "&radius=10000"
         "&keyword=$keyword"
         "&key=$apiKey";
@@ -114,6 +178,33 @@ class _TransportationScreenState extends State<TransportationScreen> {
     }
   }
 
+  Future<void> _fetchAutocompleteSuggestions(String input) async {
+    if (input.isEmpty) {
+      setState(() {
+        _autocompleteResults = [];
+      });
+      return;
+    }
+
+    String url =
+        "https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${Uri.encodeComponent(input)}&components=country:LK&key=$apiKey";
+
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      setState(() {
+        _autocompleteResults = data["predictions"];
+      });
+    }
+  }
+
+  void _selectAutocompleteSuggestion(String description) {
+    _locationController.text = description;
+    _autocompleteResults = [];
+    fetchTransportations(location: description);
+  }
+
   void _openInGoogleMaps(String placeName, String placeId) async {
     String encodedPlaceName = Uri.encodeComponent(placeName);
     String googleMapsUrl =
@@ -128,216 +219,13 @@ class _TransportationScreenState extends State<TransportationScreen> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => MainScreen()),
-        );
-        return false;
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Color(0xFF0B5739),
-          elevation: 0,
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => MainScreen()),
-              );
-            },
-          ),
-          title: Text("Transportation Finder",
-              style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white)),
-          centerTitle: false,
-        ),
-        body: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 12.0),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8.0),
-                        border: Border.all(color: Color(0xFF0B5739)),
-                      ),
-                      child: DropdownButton<String>(
-                        value: selectedType,
-                        onChanged: (String? newValue) {
-                          setState(() {
-                            selectedType = newValue!;
-                          });
-                        },
-                        items: <String>[
-                          'Tuk Tuk Rental',
-                          'Scooter Rental',
-                          'Bike Rental',
-                          'Taxi Service'
-                        ].map<DropdownMenuItem<String>>((String value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(value),
-                          );
-                        }).toList(),
-                        isExpanded: true,
-                        underline: SizedBox(),
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 10),
-                  ElevatedButton(
-                    onPressed: fetchTransportations,
-                    child: Icon(Icons.search, color: Color(0xFF0B5739)),
-                    style: ElevatedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: 16.0, vertical: 12.0),
-                      side: BorderSide(color: Color(0xFF0B5739)),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: isLoading
-                  ? Center(
-                      child: CircularProgressIndicator(
-                          valueColor:
-                              AlwaysStoppedAnimation(Color(0xFF0B5739))))
-                  : transportations.isEmpty
-                      ? Center(child: Text("No transportations found"))
-                      : ListView.builder(
-                          itemCount: transportations.length > 10
-                              ? 10
-                              : transportations.length,
-                          itemBuilder: (context, index) {
-                            final place = transportations[index];
-                            final name = place['name'];
-                            final rating =
-                                place['rating']?.toString() ?? 'No Rating';
-                            final lat = place['geometry']['location']['lat'];
-                            final lng = place['geometry']['location']['lng'];
-
-                            return Card(
-                              margin: EdgeInsets.symmetric(
-                                  vertical: 10, horizontal: 15),
-                              elevation: 5,
-                              child: GestureDetector(
-                                onTap: () {
-                                  String placeId = place["place_id"];
-                                  String placeName = place["name"];
-                                  _openInGoogleMaps(placeName, placeId);
-                                },
-                                child: Stack(
-                                  children: [
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        // Display the image (if available)
-                                        place["photos"] != null &&
-                                                place["photos"].isNotEmpty
-                                            ? Image.network(
-                                                "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${place["photos"][0]["photo_reference"]}&key=$apiKey",
-                                                fit: BoxFit.cover,
-                                                height: 180,
-                                                width: double.infinity,
-                                              )
-                                            : Container(), // If no image available, display nothing
-                                        Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                place["name"] ?? "No name",
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 18,
-                                                ),
-                                              ),
-                                              SizedBox(height: 5),
-                                              Text(
-                                                place["vicinity"] ??
-                                                    "No address",
-                                                style: TextStyle(fontSize: 14),
-                                              ),
-                                              SizedBox(height: 5),
-                                              Row(
-                                                children: [
-                                                  Text(
-                                                    "Rating: ",
-                                                    style: TextStyle(
-                                                        fontSize: 14),
-                                                  ),
-                                                  Icon(Icons.star,
-                                                      color: Colors.amber,
-                                                      size: 16),
-                                                  Text(
-                                                    " ${place["rating"]?.toString() ?? 'N/A'}",
-                                                    style: TextStyle(
-                                                        fontSize: 14),
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    Positioned(
-                                      top: 8,
-                                      right: 8,
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          color: Colors.white.withOpacity(0.8),
-                                          borderRadius:
-                                              BorderRadius.circular(50),
-                                        ),
-                                        child: IconButton(
-                                          icon: Icon(Icons.bookmark_border,
-                                              color: Colors.black),
-                                          onPressed: () {
-                                            _saveFavoriteTransportation(
-                                                context, place);
-                                          },
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Future<void> _saveFavoriteTransportation(BuildContext context, Map<String, dynamic> place) async {
+  Future<void> _saveFavoriteTransportation(
+      BuildContext context, Map<String, dynamic> place) async {
     User? user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       final userId = user.uid;
       final placeId = place['place_id'];
 
-      // Check if the place already exists in the favourite_accommodations collection for the current user
       final querySnapshot = await FirebaseFirestore.instance
           .collection('favourite_transportations')
           .where('userId', isEqualTo: userId)
@@ -345,8 +233,9 @@ class _TransportationScreenState extends State<TransportationScreen> {
           .get();
 
       if (querySnapshot.docs.isEmpty) {
-        // Place does not exist, add it to the collection
-        await FirebaseFirestore.instance.collection('favourite_transportations').add({
+        await FirebaseFirestore.instance
+            .collection('favourite_transportations')
+            .add({
           'userId': userId,
           'placeId': placeId,
           'name': place['name'],
@@ -357,19 +246,283 @@ class _TransportationScreenState extends State<TransportationScreen> {
               : null,
         });
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Place added to favourites'), backgroundColor: Colors.green),
+          SnackBar(
+              content: Text('Place added to favourites'),
+              backgroundColor: Colors.green),
         );
       } else {
-        // Place already exists, show a message or handle accordingly
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Place already added to favourites'), backgroundColor: Colors.orange),
+          SnackBar(
+              content: Text('Place already added to favourites'),
+              backgroundColor: Colors.orange),
         );
-        print('Place already added to favourites');
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('User not logged in.')),
       );
     }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus();
+      },
+      child: WillPopScope(
+        onWillPop: () async {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => MainScreen()),
+          );
+          return false;
+        },
+        child: Scaffold(
+          appBar: AppBar(
+            backgroundColor: Color(0xFF0B5739),
+            elevation: 0,
+            leading: IconButton(
+              icon: Icon(Icons.arrow_back, color: Colors.white),
+              onPressed: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => MainScreen()),
+                );
+              },
+            ),
+            title: Text("Transportation Finder",
+                style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white)),
+          ),
+          body: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    TextField(
+                      controller: _locationController,
+                      focusNode: _focusNode,
+                      onChanged: _fetchAutocompleteSuggestions,
+                      decoration: InputDecoration(
+                        hintText: "Enter a location",
+                        prefixIcon:
+                            Icon(Icons.search, color: Color(0xFF0B5739)),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                          borderSide: BorderSide(
+                            color: _focusNode.hasFocus
+                                ? Color(0xFF0B5739)
+                                : Colors.grey,
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                          borderSide: BorderSide(color: Color(0xFF0B5739)),
+                        ),
+                      ),
+                    ),
+                    if (_autocompleteResults.isNotEmpty)
+                      Container(
+                        margin: EdgeInsets.only(top: 8.0),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey),
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: _autocompleteResults.length,
+                          itemBuilder: (context, index) {
+                            final suggestion = _autocompleteResults[index];
+                            return ListTile(
+                              title: Text(suggestion["description"]),
+                              onTap: () => _selectAutocompleteSuggestion(
+                                  suggestion["description"]),
+                            );
+                          },
+                        ),
+                      ),
+                    SizedBox(height: 10),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            padding: EdgeInsets.symmetric(horizontal: 12.0),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8.0),
+                              border: Border.all(color: Color(0xFF0B5739)),
+                            ),
+                            child: DropdownButton<String>(
+                              value: selectedType,
+                              onChanged: (String? newValue) {
+                                setState(() {
+                                  selectedType = newValue!;
+                                });
+                              },
+                              items: <String>[
+                                'Tuk Tuk Rental',
+                                'Scooter Rental',
+                                'Bike Rental',
+                                'Taxi Service'
+                              ].map<DropdownMenuItem<String>>((String value) {
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Text(value),
+                                );
+                              }).toList(),
+                              isExpanded: true,
+                              underline: SizedBox(),
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 10),
+                        ElevatedButton(
+                          onPressed: () {
+                            fetchTransportations(
+                                location: _locationController.text);
+                          },
+                          child: Icon(Icons.search, color: Color(0xFF0B5739)),
+                          style: ElevatedButton.styleFrom(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 16.0, vertical: 12.0),
+                            side: BorderSide(color: Color(0xFF0B5739)),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: isLoading
+                    ? Center(
+                        child: CircularProgressIndicator(
+                            valueColor:
+                                AlwaysStoppedAnimation(Color(0xFF0B5739))))
+                    : transportations.isEmpty
+                        ? Center(child: Text("No transportations found"))
+                        : ListView.builder(
+                            itemCount: transportations.length > 10
+                                ? 10
+                                : transportations.length,
+                            itemBuilder: (context, index) {
+                              final place = transportations[index];
+                              final name = place['name'];
+                              final rating =
+                                  place['rating']?.toString() ?? 'No Rating';
+
+                              return Card(
+                                margin: EdgeInsets.symmetric(
+                                    vertical: 10, horizontal: 15),
+                                elevation: 5,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    String placeId = place["place_id"];
+                                    String placeName = place["name"];
+                                    _openInGoogleMaps(placeName, placeId);
+                                  },
+                                  child: Stack(
+                                    children: [
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          // Display the image (if available)
+                                          place["photos"] != null &&
+                                                  place["photos"].isNotEmpty
+                                              ? Image.network(
+                                                  "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${place["photos"][0]["photo_reference"]}&key=$apiKey",
+                                                  fit: BoxFit.cover,
+                                                  height: 180,
+                                                  width: double.infinity,
+                                                )
+                                              : Container(), // If no image available, display nothing
+                                          Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  place["name"] ?? "No name",
+                                                  style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 18,
+                                                  ),
+                                                ),
+                                                SizedBox(height: 5),
+                                                Text(
+                                                  place["vicinity"] ??
+                                                      "No address",
+                                                  style:
+                                                      TextStyle(fontSize: 14),
+                                                ),
+                                                SizedBox(height: 5),
+                                                Row(
+                                                  children: [
+                                                    Text(
+                                                      "Rating: ",
+                                                      style: TextStyle(
+                                                          fontSize: 14),
+                                                    ),
+                                                    Icon(Icons.star,
+                                                        color: Colors.amber,
+                                                        size: 16),
+                                                    Text(
+                                                      " ${place["rating"]?.toString() ?? 'N/A'}",
+                                                      style: TextStyle(
+                                                          fontSize: 14),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      // Bookmark button
+                                      Positioned(
+                                        top: 8,
+                                        right: 8,
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            color:
+                                                Colors.white.withOpacity(0.8),
+                                            borderRadius:
+                                                BorderRadius.circular(50),
+                                          ),
+                                          child: IconButton(
+                                            icon: Icon(Icons.bookmark_border,
+                                                color: Colors.black),
+                                            onPressed: () {
+                                              _saveFavoriteTransportation(
+                                                  context, place);
+                                            },
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+              ),
+            ],
+          ),
+          floatingActionButton: FloatingActionButton(
+            onPressed: _getCurrentPositionAndFetchTransportations,
+            backgroundColor: Colors.white,
+            child: Icon(Icons.my_location, color: Color(0xFF0B5739)),
+          ),
+        ),
+      ),
+    );
   }
 }
