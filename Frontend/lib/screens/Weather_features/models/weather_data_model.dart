@@ -5,6 +5,7 @@ class WeatherDataModel {
   final double windSpeed;
   final int humidity;
   final int clouds;
+  final int pressure; 
   final String icon;
 
   WeatherDataModel({
@@ -14,6 +15,8 @@ class WeatherDataModel {
     required this.windSpeed,
     required this.humidity,
     required this.clouds,
+    required this.pressure,
+
     required this.icon,
   });
 
@@ -25,6 +28,8 @@ class WeatherDataModel {
       windSpeed: (map["wind"]["speed"] ?? 0.0).toDouble(),
       humidity: (map["main"]["humidity"] ?? 0).toInt(),
       clouds: (map["clouds"]["all"] ?? 0).toInt(),
+      pressure: (map["main"]["pressure"] ?? 0).toInt(),
+
       icon: "https://openweathermap.org/img/wn/${map["weather"][0]["icon"]}@2x.png",
     );
   }
