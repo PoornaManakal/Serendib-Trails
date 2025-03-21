@@ -55,7 +55,7 @@ class _HomeState extends State<Home> {
                       contentPadding: const EdgeInsets.only(left: 20),
                       suffixIcon: const Icon(
                         Icons.search,
-                        color: Colors.white,
+                        color: Color.fromARGB(85, 255, 255, 255),
                       ),
                     ),
                   ),
@@ -78,7 +78,7 @@ class _HomeState extends State<Home> {
                     children: [
                       weatherInfo?.icon != null
                           ? Image.network(weatherInfo!.icon, height: 100, width: 100)
-                          : Container(height: 100, width: 100),
+                          : SizedBox(height: 100, width: 100),
                       const SizedBox(width: 10),
                       Column(
                         mainAxisAlignment: MainAxisAlignment.center,
