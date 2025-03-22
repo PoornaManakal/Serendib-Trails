@@ -6,7 +6,7 @@ on:
       - main
   push:
     branches:
-      - '*'  # Trigger CI on all branches, feel free to limit it to specific branches like main, development, etc.
+      - '*'  # Trigger CI on all branches
 
 jobs:
   ci:
