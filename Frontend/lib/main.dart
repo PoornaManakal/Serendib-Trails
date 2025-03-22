@@ -38,5 +38,3 @@ class SerendibApp extends StatelessWidget {
     );
   }
 }
-
-//test comment 1
