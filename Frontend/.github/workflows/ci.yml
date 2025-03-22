@@ -1,0 +1,147 @@
+name: "CI Workflow"
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - '*'  # Trigger CI on all branches, feel free to limit it to specific branches like main, development, etc.
+
+jobs:
+  ci:
+    name: Run CI
+    runs-on: ${{ matrix.os }}  # Use matrix for cross-platform support (windows, macos, ubuntu)
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]  # Runs the workflow on Windows, macOS, and Ubuntu
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+          architecture: x64
+
+      # Cache Flutter dependencies to speed up future runs
+      - name: Cache Flutter dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.pub-cache
+          key: ${{ runner.os }}-flutter-${{ hashFiles('**/pubspec.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-flutter-
+
+      # Cache Flutter build outputs to speed up future builds (optional)
+      - name: Cache Flutter build outputs
+        uses: actions/cache@v3
+        with:
+          path: |
+            build/
+            .dart_tool/
+          key: ${{ runner.os }}-flutter-build-${{ hashFiles('**/pubspec.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-flutter-build-
+
+      - name: Get Dependencies
+        run: flutter pub get
+
+      - name: Run Analyzer
+        run: flutter analyze
+
+      - name: Run Unit Tests
+        run: flutter test
+
+      - name: Check Flutter Version
+        run: flutter --version
+
+      - name: Print Current Working Directory (Debugging)
+        run: pwd  # Helps to see where the workflow is running (for debugging purposes)
+
+
+##only windows
+# name: "CI Workflow"
+
+# on:
+#   pull_request:
+#     branches:
+#       - main
+#   push:
+#     branches:
+#       - '*'
+
+# jobs:
+#   ci:
+#     name: Run CI
+#     runs-on: windows-latest
+#     steps:
+#       - uses: actions/checkout@v3
+
+#       - name: Set up Flutter
+#         uses: subosito/flutter-action@v2
+#         with:
+#           channel: "stable"
+#           architecture: x64
+
+#       # Cache dependencies to speed up future runs
+#       - name: Cache Flutter dependencies
+#         uses: actions/cache@v3
+#         with:
+#           path: ~/.pub-cache
+#           key: ${{ runner.os }}-flutter-${{ hashFiles('**/pubspec.yaml') }}
+#           restore-keys: |
+#             ${{ runner.os }}-flutter-
+
+#       - name: Get Dependencies
+#         run: flutter pub get
+
+#       - name: Run Analyzer
+#         run: flutter analyze
+
+#       - name: Run Unit Tests
+#         run: flutter test
+
+#       - name: Check Flutter Version
+#         run: flutter --version
+
+
+# # # ci.yml - CI Workflow for Development and Main Branches
+# # on:
+# #   pull_request:
+# #     branches:
+# #       - development
+# #       - main
+# #   push:
+# #     branches:
+# #       - development
+# #       - main
+
+# # name: "CI Workflow"
+
+# # jobs:
+# #   ci:
+# #     name: Run CI
+# #     runs-on: macos-latest
+# #     steps:
+# #       - uses: actions/checkout@v3
+
+# #       - uses: actions/setup-java@v3
+# #         with:
+# #           distribution: "zulu"
+# #           java-version: "17"
+
+# #       - uses: subosito/flutter-action@v2
+# #         with:
+# #           channel: "stable"
+# #           architecture: x64
+
+# #       - name: Get Dependencies
+# #         run: flutter pub get
+
+# #       - name: Run Analyzer
+# #         run: flutter analyze
+
+# #       - name: Run Unit Tests
+# #         run: flutter test
