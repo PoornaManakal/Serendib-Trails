@@ -61,50 +61,6 @@ jobs:
         run: pwd  # Helps to see where the workflow is running (for debugging purposes)
 
 
-##only windows
-# name: "CI Workflow"
-
-# on:
-#   pull_request:
-#     branches:
-#       - main
-#   push:
-#     branches:
-#       - '*'
-
-# jobs:
-#   ci:
-#     name: Run CI
-#     runs-on: windows-latest
-#     steps:
-#       - uses: actions/checkout@v3
-
-#       - name: Set up Flutter
-#         uses: subosito/flutter-action@v2
-#         with:
-#           channel: "stable"
-#           architecture: x64
-
-#       # Cache dependencies to speed up future runs
-#       - name: Cache Flutter dependencies
-#         uses: actions/cache@v3
-#         with:
-#           path: ~/.pub-cache
-#           key: ${{ runner.os }}-flutter-${{ hashFiles('**/pubspec.yaml') }}
-#           restore-keys: |
-#             ${{ runner.os }}-flutter-
-
-#       - name: Get Dependencies
-#         run: flutter pub get
-
-#       - name: Run Analyzer
-#         run: flutter analyze
-
-#       - name: Run Unit Tests
-#         run: flutter test
-
-#       - name: Check Flutter Version
-#         run: flutter --version
 
 
 # # # ci.yml - CI Workflow for Development and Main Branches
