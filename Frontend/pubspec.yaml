@@ -72,6 +72,7 @@ flutter:
     - lib/assets/images/landing1.jpg
     - lib/assets/images/landing2.jpg
     - lib/assets/images/landing3.jpg
+    - lib/assets/images/teamlogo.png
     - assets/ 
 
   # To add assets to your application, add an assets section, like this:

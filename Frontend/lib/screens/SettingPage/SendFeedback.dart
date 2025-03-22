@@ -1,12 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:serendib_trails/screens/BucketListPage.dart';
-import 'package:serendib_trails/screens/Create_a_plan.dart';
-import 'package:serendib_trails/screens/Explore.dart';
-import 'package:serendib_trails/screens/Home.dart';
-import 'package:serendib_trails/screens/SettingPage/setting.dart';
-//import 'package:first_project/AccountPage.dart';
-//import 'package:first_project/AboutPage.dart';
-//import 'package:first_project/SettingsPage.dart';
 
 class SendFeedbackPage extends StatefulWidget {
   @override
@@ -14,16 +6,6 @@ class SendFeedbackPage extends StatefulWidget {
 }
 
 class _SendFeedbackPageState extends State<SendFeedbackPage> {
-  int _currentIndex = 4; // Default to Settings page
-
-  final List<Widget> _pages = [
-    HomeScreen(),
-    ExplorePage(),
-    CreateAPlanPage(),
-    BucketListPage(),
-    SettingScreen(),
-  ];
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -109,7 +91,11 @@ class _SendFeedbackPageState extends State<SendFeedbackPage> {
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.sports_tennis, color: Colors.black),
+                      Image.asset(
+                        "lib/assets/images/teamlogo.png", // Replace with your actual image path
+                        width: 40, // Adjust size as needed
+                        height: 40,
+                      ),
                       SizedBox(width: 5),
                       Text(
                         "Team Serendib Trails",
@@ -134,32 +120,6 @@ class _SendFeedbackPageState extends State<SendFeedbackPage> {
             ],
           ),
         ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: Colors.green,
-        unselectedItemColor: Colors.black,
-        showSelectedLabels: false,
-        showUnselectedLabels: false,
-        currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => _pages[index]),
-            );
-          });
-        },
-        items: [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-          BottomNavigationBarItem(icon: Icon(Icons.explore), label: "Explore"),
-          BottomNavigationBarItem(icon: Icon(Icons.add_circle), label: "Add"),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.bookmark), label: "Bookmarks"),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.settings), label: "Settings"),
-        ],
       ),
     );
   }
