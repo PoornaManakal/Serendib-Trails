@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 void main(){
   runApp(AugmentedReality());
@@ -37,8 +38,35 @@ Widget build(BuildContext context) {
                 fontSize: 16
                 color: Colors.black
               ),
-              textAlign: Center,
+              textAlign: TextAlign.center,
             ),)
+            const Sizedbox(height:20),
+
+
+
+            Expanded(child: ListView(
+              padding: const EdgeInsets.symmetric(horizontal:20),
+              children: [
+                landmarkButton(
+                  context,
+                  imagePath:'lib/temple_tooth.jpeg'
+                  title:"Temple of Tooth",
+                  Description:
+                  "The Temple of the Tooth Relic in Kandy, Sri Lanka, is a sacred Buddhist temple..."
+
+                )
+              ],
+            ))
+
+
+
+
+
+
+
+
+
+
           ],  
         ),
       )
