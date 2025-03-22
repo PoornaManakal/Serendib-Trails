@@ -6,7 +6,6 @@ import 'package:serendib_trails/screens/Login_Screens/SignIn_screen.dart';
 import 'package:serendib_trails/screens/Login_Screens/SignUp_screen.dart';
 import 'package:serendib_trails/screens/main_screen.dart';
 import 'package:serendib_trails/screens/Attractions/select_interests_screen.dart';
-import 'screens/welcomepage.dart';
 import 'screens/splashscreen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -28,7 +27,6 @@ class SerendibApp extends StatelessWidget {
       initialRoute: '/', // Start with splash screen
       routes: {
         '/': (context) => const SplashScreen(),
-        '/welcome': (context) => const WelcomePage(),
         'LandingPage': (context) => const LandingPage(),
         '/signup': (context) => const SignupScreen(),
         '/signin': (context) => const SigninScreen(),
