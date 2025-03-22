@@ -54,7 +54,16 @@ Widget build(BuildContext context) {
                   Description:
                   "The Temple of the Tooth Relic in Kandy, Sri Lanka, is a sacred Buddhist temple..."
 
-                )
+                ),
+                landmarkButton(
+                  context,
+                  imagePath:'lib/ldambulla_temple.jpg'
+                  title:"Dambulla Cave Temple",
+                  Description:"Dambulla Cave Temple is a UNESCO World Heritage Site featuring intricate murals...",
+
+
+                ),
+                
               ],
             ))
 
