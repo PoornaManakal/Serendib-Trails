@@ -19,10 +19,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      # Change directory to 'Frontend' to access pubspec.yaml
-      - name: Change Directory to Frontend
-        run: cd Frontend
-
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -51,15 +47,19 @@ jobs:
 
       - name: Get Dependencies
         run: flutter pub get
+        working-directory: Frontend  # Specify that this should run in the 'Frontend' directory
 
       - name: Run Analyzer
         run: flutter analyze
+        working-directory: Frontend  # Specify that this should run in the 'Frontend' directory
 
       - name: Run Unit Tests
         run: flutter test
+        working-directory: Frontend  # Specify that this should run in the 'Frontend' directory
 
       - name: Check Flutter Version
         run: flutter --version
+        working-directory: Frontend  # Specify that this should run in the 'Frontend' directory
 
       - name: Print Current Working Directory (Debugging)
         run: pwd  # Helps to see where the workflow is running (for debugging purposes)
