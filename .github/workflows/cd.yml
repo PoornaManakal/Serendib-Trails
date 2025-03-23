@@ -21,7 +21,6 @@ jobs:
         with:
           channel: "stable"
           architecture: x64
-        working-directory: Frontend  # Ensure Flutter setup happens in the 'Frontend' directory
 
       - name: Cache Flutter build
         uses: actions/cache@v3
@@ -32,20 +31,20 @@ jobs:
           key: ${{ runner.os }}-flutter-${{ hashFiles('Frontend/**/pubspec.yaml') }}
           restore-keys: |
             ${{ runner.os }}-flutter-
-        working-directory: Frontend  # Specify working directory for caching Flutter build outputs
+        #working-directory: Frontend  # Specify working directory for caching Flutter build outputs
 
       - name: Install Java
         uses: actions/setup-java@v3
         with:
           distribution: "zulu"
           java-version: "17"
-        working-directory: Frontend  # Java installation should happen in the 'Frontend' directory
+        #working-directory: Frontend  # Java installation should happen in the 'Frontend' directory
 
       # --- Android Build and Release (Windows or Ubuntu) ---
       - name: Build APK
         if: runner.os == 'Windows' || runner.os == 'ubuntu-latest'
         run: flutter build apk --release --split-per-abi
-        working-directory: Frontend  # Specify working directory for building the APK
+        #working-directory: Frontend  # Specify working directory for building the APK
 
       - name: Push Android APK
         if: runner.os == 'Windows' || runner.os == 'ubuntu-latest'
@@ -54,7 +53,7 @@ jobs:
           artifacts: Frontend/build/app/outputs/apk/release/*.apk
           tag: v1.0.${{ github.run_number }}
           token: ${{ secrets.DEPLOY_TOKEN }}
-        working-directory: Frontend  # Specify working directory for pushing the APK
+        #working-directory: Frontend  # Specify working directory for pushing the APK
 
       # --- iOS Build and Release (macOS only) ---
       - name: Build iOS
@@ -67,7 +66,7 @@ jobs:
           ln -s ../Runner.app
           cd ..
           zip -r app.ipa Payload
-        working-directory: Frontend  # Specify working directory for building the iOS app
+        #working-directory: Frontend  # Specify working directory for building the iOS app
 
       - name: Push iOS IPA
         if: runner.os == 'macos-latest'
@@ -76,4 +75,4 @@ jobs:
           artifacts: Frontend/build/ios/iphoneos/app.ipa
           tag: v1.0.${{ github.run_number }}
           token: ${{ secrets.DEPLOY_TOKEN }}
-        working-directory: Frontend  # Specify working directory for pushing the IPA
+        #working-directory: Frontend  # Specify working directory for pushing the IPA

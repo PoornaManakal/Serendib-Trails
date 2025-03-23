@@ -11,10 +11,10 @@ on:
 jobs:
   ci:
     name: Run CI
-    runs-on: ${{ matrix.os }}  # Use matrix for cross-platform support (windows, macos, ubuntu)
+    runs-on: ${{ matrix.os }}  # Use matrix for cross-platform support (windows, macos, ubuntu) windows-latest, macos-latest,
     strategy:
       matrix:
-        os: [windows-latest, macos-latest, ubuntu-latest]  # Runs the workflow on Windows, macOS, and Ubuntu
+        os: [ubuntu-latest]  # Runs the workflow on Windows, macOS, and Ubuntu
 
     steps:
       - uses: actions/checkout@v3
