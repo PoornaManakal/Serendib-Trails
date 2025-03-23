@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:serendib_trails/screens/New_Weather_Feature/providers/weather_data_provider.dart';
 import 'package:weather_icons/weather_icons.dart';
-import 'package:weatherapp/constants/colors.dart';
-import 'package:weatherapp/providers/weather_data_provider.dart';
+import 'package:serendib_trails/screens/New_Weather_Feature/constants/colors.dart';
+import 'package:serendib_trails/screens/main_screen.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -15,6 +16,7 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
+    // Fetch weather data for the current location
     Provider.of<WeatherDataProvider>(context, listen: false)
         .fetchCurrentLocationWeather();
   }
@@ -24,107 +26,138 @@ class _HomeState extends State<Home> {
     final weatherProvider = Provider.of<WeatherDataProvider>(context);
     final weatherInfo = weatherProvider.weatherInfo;
 
-    return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [gradient1, gradient2, gradient3],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              children: [
-                // Search Bar
-                SizedBox(
-                  height: 50,
-                  child: TextField(
-                    onSubmitted: (value) {
-                      weatherProvider.fetchData(value);
-                    },
-                    style: const TextStyle(
-                      color: primaryTextColor,
-                      fontSize: 15,
-                    ),
-                    decoration: InputDecoration(
-                      enabledBorder: _inputBorder(),
-                      focusedBorder: _inputBorder(),
-                      contentPadding: const EdgeInsets.only(left: 20),
-                      suffixIcon: const Icon(
-                        Icons.search,
-                        color: Color.fromARGB(85, 255, 255, 255),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                // Current Location
-                Text(
-                  "📍 ${weatherInfo?.cityName ?? 'Loading...'}",
-                  style: const TextStyle(
-                    fontSize: 18,
-                    color: Colors.white,
+    return WillPopScope(
+      onWillPop: () async {
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => MainScreen()),
+          (route) => false,
+        );
+        return false;
+      },
+      child: Scaffold(
+         appBar: AppBar(
+            backgroundColor: Color(0xFF0B5739),
+            elevation: 0,
+            leading: IconButton(
+              icon: Icon(Icons.arrow_back, color: Colors.white),
+              onPressed: () {
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => MainScreen()),
+                  (route) => false,
+                );
+                
+              },
+            ),
+            title: Text("Weather",
+                style: TextStyle(
+                    fontSize: 20,
                     fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 50),
-                // Weather Icon and Temperature
-                Flexible(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      weatherInfo?.icon != null
-                          ? Image.network(weatherInfo!.icon, height: 100, width: 100)
-                          : SizedBox(height: 100, width: 100),
-                      const SizedBox(width: 10),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _richText(weatherInfo?.currentTemp, "°C", 70, 40),
-                          _richText(weatherInfo?.feelsLike, "°C", 15, 15,
-                              prefix: "Feels Like "),
-                        ],
+                    color: Colors.white)),
+          ),
+        body: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.white, gradient2, gradient3],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                children: [
+                  // Search Bar
+                  SizedBox(
+                    height: 50,
+                    child: TextField(
+                      onSubmitted: (value) {
+                        weatherProvider.fetchData(value);
+                      },
+                      style: const TextStyle(
+                        color: primaryTextColor,
+                        fontSize: 15,
                       ),
-                    ],
-                  ),
-                ),
-                // Weather Details
-                Flexible(
-                  flex: 2,
-                  child: Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: secondaryBgColor,
-                        border: Border.all(
-                          color: const Color.fromARGB(212, 2, 43, 14),
-                          width: 5,
+                      decoration: InputDecoration(
+                        enabledBorder: _inputBorder(),
+                        focusedBorder: _inputBorder(),
+                        contentPadding: const EdgeInsets.only(left: 20),
+                        suffixIcon: const Icon(
+                          Icons.search,
+                          color: Color.fromARGB(85, 255, 255, 255),
                         ),
-                        borderRadius: BorderRadius.circular(25),
                       ),
-                      child: Center(
-                        child: ListView(
-                          shrinkWrap: true,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  // Current Location
+                  Text(
+                    "📍 ${weatherInfo?.cityName ?? 'Loading...'}",
+                    style: const TextStyle(
+                      fontSize: 18,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 50),
+                  // Weather Icon and Temperature
+                  Flexible(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        weatherInfo?.icon != null
+                            ? Image.network(weatherInfo!.icon,
+                                height: 100, width: 100)
+                            : const SizedBox(height: 100, width: 100),
+                        const SizedBox(width: 10),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _weatherDetailTile(WeatherIcons.strong_wind, "Wind Speed",
-                                "${weatherInfo?.windSpeed ?? 0} Km/h"),
-                            _weatherDetailTile(WeatherIcons.humidity, "Humidity",
-                                "${weatherInfo?.humidity ?? 0}%"),
-                            _weatherDetailTile(
-                                WeatherIcons.cloud, "Clouds", "${weatherInfo?.clouds ?? 0}%"),
-                            _weatherDetailTile(
-                                WeatherIcons.barometer, "Pressure", "${weatherInfo?.pressure ?? 0}mb"),
+                            _richText(weatherInfo?.currentTemp, "°C", 70, 40),
+                            _richText(weatherInfo?.feelsLike, "°C", 15, 15,
+                                prefix: "Feels Like "),
                           ],
                         ),
-                      ),
+                      ],
                     ),
                   ),
-                )
-              ],
+                  // Weather Details
+                  Flexible(
+                    flex: 2,
+                    child: Padding(
+                      padding: const EdgeInsets.all(10),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: secondaryBgColor,
+                          border: Border.all(
+                            color: const Color.fromARGB(212, 2, 43, 14),
+                            width: 5,
+                          ),
+                          borderRadius: BorderRadius.circular(25),
+                        ),
+                        child: Center(
+                          child: ListView(
+                            shrinkWrap: true,
+                            children: [
+                              _weatherDetailTile(WeatherIcons.strong_wind,
+                                  "Wind Speed", "${weatherInfo?.windSpeed ?? 0} Km/h"),
+                              _weatherDetailTile(WeatherIcons.humidity,
+                                  "Humidity", "${weatherInfo?.humidity ?? 0}%"),
+                              _weatherDetailTile(WeatherIcons.cloud, "Clouds",
+                                  "${weatherInfo?.clouds ?? 0}%"),
+                              _weatherDetailTile(WeatherIcons.barometer,
+                                  "Pressure", "${weatherInfo?.pressure ?? 0}mb"),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  )
+                ],
+              ),
             ),
           ),
         ),

@@ -7,6 +7,7 @@ import 'package:serendib_trails/screens/Login_Screens/SignIn_screen.dart';
 import 'package:serendib_trails/screens/Attractions/details.dart';
 import 'package:serendib_trails/screens/Attractions/TravelMapPage.dart';
 import 'package:serendib_trails/screens/SettingPage/ProfilePage.dart';
+import 'package:serendib_trails/screens/SettingPage/SendFeedback.dart';
 import 'package:serendib_trails/screens/SettingPage/setting.dart';
 import 'package:serendib_trails/screens/main_screen.dart';
 import 'package:serendib_trails/widgets/side_menu.dart';
@@ -71,9 +72,9 @@ class _HomeScreenState extends State<HomeScreen>
             return AlertDialog(
               shape: RoundedRectangleBorder(
                 borderRadius:
-                    BorderRadius.circular(16), // Rounded corners for the dialog
+                    BorderRadius.circular(16), 
               ),
-              titlePadding: EdgeInsets.all(20), // Padding for title
+              titlePadding: EdgeInsets.all(20), 
               title: Center(
                 child: Text(
                   'Are you sure you want to exit?',
@@ -81,13 +82,13 @@ class _HomeScreenState extends State<HomeScreen>
                   textAlign: TextAlign.center,
                 ),
               ),
-              contentPadding: EdgeInsets.zero, // Remove extra spacing
-              actionsPadding: EdgeInsets.zero, // Align buttons to edges
+              contentPadding: EdgeInsets.zero, 
+              actionsPadding: EdgeInsets.zero, 
               actions: [
                 Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.vertical(
-                        bottom: Radius.circular(16)), // Rounded bottom
+                        bottom: Radius.circular(16)),
                   ),
                   child: Row(
                     children: [
@@ -96,17 +97,17 @@ class _HomeScreenState extends State<HomeScreen>
                           onPressed: () => Navigator.of(context).pop(false),
                           style: TextButton.styleFrom(
                             backgroundColor:
-                                Colors.grey.shade400, // Gray button
+                                Colors.grey.shade400, 
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.only(
                                 bottomLeft:
-                                    Radius.circular(16), // Rounded left corner
+                                    Radius.circular(16), 
                               ),
                             ),
                           ),
                           child: Padding(
                             padding: EdgeInsets.symmetric(
-                                vertical: 5), // Button height
+                                vertical: 5), 
                             child: Text('No',
                                 style: TextStyle(
                                     color: Colors.white, fontSize: 16)),
@@ -121,13 +122,13 @@ class _HomeScreenState extends State<HomeScreen>
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.only(
                                 bottomRight:
-                                    Radius.circular(16), // Rounded right corner
+                                    Radius.circular(16), 
                               ),
                             ),
                           ),
                           child: Padding(
                             padding: EdgeInsets.symmetric(
-                                vertical: 5), // Button height
+                                vertical: 5), 
                             child: Text('Yes',
                                 style: TextStyle(
                                     color: Colors.white, fontSize: 16)),
@@ -145,7 +146,7 @@ class _HomeScreenState extends State<HomeScreen>
       },
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: const Color(0xFF0B5739), // Green color
+          backgroundColor: const Color(0xFF0B5739), 
           iconTheme: IconThemeData(color: Colors.white, size: 30.0),
           flexibleSpace: Stack(
             children: [
@@ -163,9 +164,9 @@ class _HomeScreenState extends State<HomeScreen>
           actions: [
             PopupMenuTheme(
               data: PopupMenuThemeData(
-                color: Colors.white, // Background color of the popup menu
+                color: Colors.white, 
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8), // Rounded corners
+                  borderRadius: BorderRadius.circular(8), 
                 ),
               ),
               child: PopupMenuButton<String>(
@@ -191,6 +192,16 @@ class _HomeScreenState extends State<HomeScreen>
                       );
                       break;
 
+                    case 'Send Feedback':
+                      // Navigate to Send Feedback screen
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                SendFeedbackPage()), 
+                      );
+                      break;  
+
                     case 'settings':
                       // Navigate to Settings screen
                       Navigator.pushAndRemoveUntil(
@@ -198,7 +209,7 @@ class _HomeScreenState extends State<HomeScreen>
                         MaterialPageRoute(
                             builder: (context) => MainScreen(
                                   selectedIndex: 4,
-                                )), // Replace with your Settings screen
+                                )), 
                         (Route<dynamic> route) => false,
                       );
                       break;
@@ -276,13 +287,13 @@ class _HomeScreenState extends State<HomeScreen>
                                           shape: RoundedRectangleBorder(
                                             borderRadius: BorderRadius.only(
                                               bottomRight: Radius.circular(
-                                                  16), // Rounded right corner
+                                                  16), 
                                             ),
                                           ),
                                         ),
                                         child: Padding(
                                           padding: EdgeInsets.symmetric(
-                                              vertical: 5), // Button height
+                                              vertical: 5), 
                                           child: Text('Yes',
                                               style: TextStyle(
                                                   color: Colors.white,
@@ -306,8 +317,8 @@ class _HomeScreenState extends State<HomeScreen>
                     child: Text(
                       'My Profile',
                       style: TextStyle(
-                        color: Color(0xFF0B5739), // Text color
-                        fontSize: 16, // Text size
+                        color: Color(0xFF0B5739), 
+                        fontSize: 16, 
                       ),
                     ),
                   ),
@@ -316,8 +327,18 @@ class _HomeScreenState extends State<HomeScreen>
                     child: Text(
                       'Favourites',
                       style: TextStyle(
-                        color: Color(0xFF0B5739), // Text color
-                        fontSize: 16, // Text size
+                        color: Color(0xFF0B5739), 
+                        fontSize: 16, 
+                      ),
+                    ),
+                  ),
+                  const PopupMenuItem<String>(
+                    value: 'Send Feedback',
+                    child: Text(
+                      'Send Feedback',
+                      style: TextStyle(
+                        color: Color(0xFF0B5739), 
+                        fontSize: 16, 
                       ),
                     ),
                   ),
@@ -325,17 +346,17 @@ class _HomeScreenState extends State<HomeScreen>
                     value: 'settings',
                     child: Text('Settings',
                         style: TextStyle(
-                          color: Color(0xFF0B5739), // Text color
+                          color: Color(0xFF0B5739), 
                           fontSize: 16,
-                        ) // Text size
+                        ) 
                         ),
                   ),
                   const PopupMenuItem<String>(
                     value: 'Logout',
                     child: Text('Logout',
                     style: TextStyle(
-                      color: Colors.red, // Text color
-                      fontSize: 16, // Text size
+                      color: Colors.red, 
+                      fontSize: 16, 
                     ),
                     ),
                   ),
@@ -346,22 +367,22 @@ class _HomeScreenState extends State<HomeScreen>
           bottom: PreferredSize(
             preferredSize: Size.fromHeight(kToolbarHeight),
             child: Container(
-              color: Color(0xFFFEF7FF), // Background color of the TabBar
+              color: Color(0xFFFEF7FF), 
               child: TabBar(
                 controller: _tabController,
                 indicator: UnderlineTabIndicator(
                   borderSide: BorderSide(
                       width: 4.0,
                       color: Color(
-                          0xFF0B5739)), // Customize the underline color and thickness
+                          0xFF0B5739)), 
                   insets: EdgeInsets.symmetric(
                       horizontal:
-                          16.0), // Customize the horizontal padding of the underline
+                          16.0), 
                 ),
                 labelColor:
-                    Color(0xFF0B5739), // Color of the selected tab label
+                    Color(0xFF0B5739), 
                 unselectedLabelColor:
-                    Colors.grey, // Color of the unselected tab label
+                    Colors.grey, 
                 tabs: [
                   Tab(text: "Ongoing Trips"),
                   Tab(text: "Upcoming Trips"),
@@ -808,8 +829,8 @@ class WelcomeMessage extends StatelessWidget {
                 );
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFF0B5739), // Button color
-                foregroundColor: Colors.white, // Text color
+                backgroundColor: Color(0xFF0B5739),
+                foregroundColor: Colors.white, 
                 padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
