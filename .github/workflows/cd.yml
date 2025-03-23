@@ -53,7 +53,7 @@ jobs:
           artifacts: Frontend/build/app/outputs/apk/release/*.apk
           tag: v1.0.${{ github.run_number }}
           token: ${{ secrets.DEPLOY_TOKEN }}
-        working-directory: Frontend  # Specify working directory for pushing the APK
+        #working-directory: Frontend  # Specify working directory for pushing the APK
 
       # --- iOS Build and Release (macOS only) ---
       - name: Build iOS
@@ -66,7 +66,7 @@ jobs:
           ln -s ../Runner.app
           cd ..
           zip -r app.ipa Payload
-        #working-directory: Frontend  # Specify working directory for building the iOS app
+        working-directory: Frontend  # Specify working directory for building the iOS app
         continue-on-error: true 
 
       - name: Push iOS IPA
