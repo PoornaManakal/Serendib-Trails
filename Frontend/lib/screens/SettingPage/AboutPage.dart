@@ -27,7 +27,7 @@ class _AboutPageState extends State<AboutPage> {
     TeamMember(
         name: "Pamesha Devin",
         role: "Frontend Sub Developer",
-        imagePath: "lib/assets/images/Devin.jpg"),
+        imagePath: "lib/assets/images/devin.png"),
     TeamMember(
         name: "Kavindu Mendis",
         role: "Main Frontend Developer",

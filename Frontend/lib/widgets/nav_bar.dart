@@ -13,16 +13,48 @@ class BottomNavBar extends StatelessWidget {
       backgroundColor: Color(0xFF0B5739),
       selectedItemColor: Colors.white,
       unselectedItemColor: Colors.black,
-      showSelectedLabels: false,
-      showUnselectedLabels: false,
+      showSelectedLabels: true,
+      showUnselectedLabels: true,
       currentIndex: currentIndex,
       onTap: onTap,
       items: [
-        BottomNavigationBarItem(icon: Icon(Icons.home, size: 30), label: "Home"),
-        BottomNavigationBarItem(icon: Icon(Icons.hotel, size: 30), label: "Explore"),
-        BottomNavigationBarItem(icon: Icon(Icons.add_circle, size: 30), label: "Add"),
-        BottomNavigationBarItem(icon: Icon(Icons.directions_bus, size: 30), label: "Bookmarks"),
-        BottomNavigationBarItem(icon: Icon(Icons.settings, size: 30), label: "Settings"),
+        BottomNavigationBarItem(
+          icon: Icon(
+            currentIndex == 0 ? Icons.home : Icons.home_outlined,
+            size: 30,
+          ),
+          label: "Home",
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(
+            currentIndex == 1 ? Icons.hotel : Icons.local_hotel_outlined,
+            size: 30,
+          ),
+          label: "Accommodations",
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(
+            currentIndex == 2 ? Icons.add_circle : Icons.add_circle_outline,
+            size: 30,
+          ),
+          label: "Create Trip",
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(
+            currentIndex == 3
+                ? Icons.directions_bus
+                : Icons.directions_bus_outlined,
+            size: 30,
+          ),
+          label: "Transportations",
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(
+            currentIndex == 4 ? Icons.settings : Icons.settings_outlined,
+            size: 30,
+          ),
+          label: "Settings",
+        ),
       ],
     );
   }
