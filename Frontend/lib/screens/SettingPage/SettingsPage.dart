@@ -1,12 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:serendib_trails/screens/Favourites/Favourites.dart';
-import 'package:serendib_trails/screens/Home.dart';
 import 'package:serendib_trails/screens/SettingPage/SendFeedback.dart';
-import 'package:serendib_trails/screens/SettingPage/setting.dart';
 
-//import 'package:first_project/LanguageSettingsPage.dart'; // Example page
-//import 'package:first_project/NotificationSettingsPage.dart'; // Example page
-//import 'package:first_project/UpdateVersionPage.dart'; // Example page
 
 class SettingsPage extends StatefulWidget {
   @override
@@ -14,11 +8,7 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  int _currentIndex = 4; // Initial index for the BottomNavigationBar
-
-  // List of pages for Bottom Navigation
-  
-
+ 
   @override
   Widget build(BuildContext context) {
     return Scaffold(

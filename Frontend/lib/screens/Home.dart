@@ -178,7 +178,7 @@ class _HomeScreenState extends State<HomeScreen>
                         context,
                         MaterialPageRoute(
                             builder: (context) =>
-                                ProfilePage()), // Replace with your Profile screen
+                                ProfilePage()), 
                       );
                       break;
                     case 'favourites':
@@ -187,7 +187,7 @@ class _HomeScreenState extends State<HomeScreen>
                         context,
                         MaterialPageRoute(
                             builder: (context) =>
-                                FavouritesScreen()), // Replace with your Settings screen
+                                FavouritesScreen()), 
                       );
                       break;
 
@@ -209,10 +209,10 @@ class _HomeScreenState extends State<HomeScreen>
                           return AlertDialog(
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(
-                                  16), // Rounded corners for the dialog
+                                  16), 
                             ),
                             titlePadding:
-                                EdgeInsets.all(20), // Padding for title
+                                EdgeInsets.all(20), 
                             title: Center(
                               child: Text(
                                 'Are you sure you want to sign out?',
@@ -222,15 +222,15 @@ class _HomeScreenState extends State<HomeScreen>
                               ),
                             ),
                             contentPadding:
-                                EdgeInsets.zero, // Remove extra spacing
+                                EdgeInsets.zero, 
                             actionsPadding:
-                                EdgeInsets.zero, // Align buttons to edges
+                                EdgeInsets.zero, 
                             actions: [
                               Container(
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.vertical(
                                       bottom: Radius.circular(
-                                          16)), // Rounded bottom
+                                          16)), 
                                 ),
                                 child: Row(
                                   children: [
@@ -240,17 +240,17 @@ class _HomeScreenState extends State<HomeScreen>
                                             Navigator.of(context).pop(false),
                                         style: TextButton.styleFrom(
                                           backgroundColor: Colors
-                                              .grey.shade400, // Gray button
+                                              .grey.shade400, 
                                           shape: RoundedRectangleBorder(
                                             borderRadius: BorderRadius.only(
                                               bottomLeft: Radius.circular(
-                                                  16), // Rounded left corner
+                                                  16), 
                                             ),
                                           ),
                                         ),
                                         child: Padding(
                                           padding: EdgeInsets.symmetric(
-                                              vertical: 5), // Button height
+                                              vertical: 5), 
                                           child: Text('No',
                                               style: TextStyle(
                                                   color: Colors.white,
