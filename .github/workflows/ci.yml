@@ -19,6 +19,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+        # Create the .env file inside the 'Frontend' directory using the Google Maps API key
+      - name: Create .env file with Google Maps API Key
+        run: echo "GOOGLE_MAPS_API_KEY=${{ secrets.GOOGLE_MAPS_API_KEY }}" > Frontend/.env
+        working-directory: .  # Ensures this command runs in the root directory to access Frontend
+
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
