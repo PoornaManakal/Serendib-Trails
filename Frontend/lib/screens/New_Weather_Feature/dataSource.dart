@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:weatherapp/models/weather_data_model.dart';
+import 'package:serendib_trails/screens/New_Weather_Feature/models/weather_data_model.dart';
+
 
 class Datasource {
   String appId = "e09bae7fd85e852eb5a30abf6db03fbe";

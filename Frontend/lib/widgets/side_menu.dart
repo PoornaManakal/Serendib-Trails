@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:serendib_trails/screens/Favourites/Favourites.dart';
 import 'package:serendib_trails/screens/Login_Screens/SignIn_screen.dart';
+import 'package:serendib_trails/screens/New_Weather_Feature/home.dart';
 import 'package:serendib_trails/screens/SettingPage/ProfilePage.dart';
 import 'package:serendib_trails/screens/main_screen.dart';
 import 'package:serendib_trails/screens/Attractions/map_page.dart';
@@ -56,9 +57,9 @@ class _SideMenuState extends State<SideMenu> {
       builder: (context) {
         return AlertDialog(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16), // Rounded corners for the dialog
+            borderRadius: BorderRadius.circular(16), 
           ),
-          titlePadding: EdgeInsets.all(20), // Padding for title
+          titlePadding: EdgeInsets.all(20), 
           title: Center(
             child: Text(
               'Are you sure you want to sign out?',
@@ -66,13 +67,13 @@ class _SideMenuState extends State<SideMenu> {
               textAlign: TextAlign.center,
             ),
           ),
-          contentPadding: EdgeInsets.zero, // Remove extra spacing
-          actionsPadding: EdgeInsets.zero, // Align buttons to edges
+          contentPadding: EdgeInsets.zero, 
+          actionsPadding: EdgeInsets.zero, 
           actions: [
             Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.vertical(
-                    bottom: Radius.circular(16)), // Rounded bottom
+                    bottom: Radius.circular(16)),
               ),
               child: Row(
                 children: [
@@ -80,15 +81,15 @@ class _SideMenuState extends State<SideMenu> {
                     child: TextButton(
                       onPressed: () => Navigator.of(context).pop(false),
                       style: TextButton.styleFrom(
-                        backgroundColor: Colors.grey.shade400, // Gray button
+                        backgroundColor: Colors.grey.shade400, 
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.only(
-                            bottomLeft: Radius.circular(16), // Rounded left corner
+                            bottomLeft: Radius.circular(16), 
                           ),
                         ),
                       ),
                       child: Padding(
-                        padding: EdgeInsets.symmetric(vertical: 5), // Button height
+                        padding: EdgeInsets.symmetric(vertical: 5), 
                         child: Text('No',
                             style: TextStyle(color: Colors.white, fontSize: 16)),
                       ),
@@ -101,12 +102,12 @@ class _SideMenuState extends State<SideMenu> {
                         backgroundColor: Color(0xFF0B5739),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.only(
-                            bottomRight: Radius.circular(16), // Rounded right corner
+                            bottomRight: Radius.circular(16), 
                           ),
                         ),
                       ),
                       child: Padding(
-                        padding: EdgeInsets.symmetric(vertical: 5), // Button height
+                        padding: EdgeInsets.symmetric(vertical: 5),
                         child: Text('Yes',
                             style: TextStyle(color: Colors.white, fontSize: 16)),
                       ),
@@ -129,13 +130,12 @@ class _SideMenuState extends State<SideMenu> {
   Widget build(BuildContext context) {
     return Drawer(
       child: Container(
-        color: Colors.white, // Background color
+        color: Colors.white, 
         child: Column(
           children: [
-            // User Info Section with Full-Width Background
             Container(
-              width: double.infinity, // Ensures full width
-              color: Color(0xFF0B5739), // Header background color
+              width: double.infinity, 
+              color: Color(0xFF0B5739), 
               padding: EdgeInsets.symmetric(vertical: 30),
               child: Column(
                 children: [
@@ -190,12 +190,20 @@ class _SideMenuState extends State<SideMenu> {
                     },
                   ),
                   ListTile(
+                    leading: Icon(Icons.cloud, color: Color(0xFF0B5739)),
+                    title: Text("Weather", style: TextStyle(color: Color(0xFF0B5739))),
+                    onTap: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => Home()));
+                    },
+                  ),
+                  ListTile(
                     leading: Icon(Icons.map, color: Color(0xFF0B5739)),
                     title: Text("Map", style: TextStyle(color: Color(0xFF0B5739))),
                     onTap: () {
                       Navigator.push(context, MaterialPageRoute(builder: (context) => MapPage()));
                     },
                   ),
+                  
                   ListTile(
                     leading: Icon(Icons.settings, color: Color(0xFF0B5739)),
                     title: Text("Settings", style: TextStyle(color: Color(0xFF0B5739))),

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:weatherapp/dataSource.dart';
-import 'package:weatherapp/models/weather_data_model.dart';
 import 'package:geolocator/geolocator.dart';
-
+import 'package:serendib_trails/screens/New_Weather_Feature/models/weather_data_model.dart';
+import 'package:serendib_trails/screens/New_Weather_Feature/dataSource.dart';
 class WeatherDataProvider extends ChangeNotifier {
   WeatherDataModel? _weatherDataModel;
 
