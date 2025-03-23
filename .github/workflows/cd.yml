@@ -1,0 +1,79 @@
+name: "Build & Release"
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Build & Release
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest]
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+          architecture: x64
+        working-directory: Frontend  # Ensure Flutter setup happens in the 'Frontend' directory
+
+      - name: Cache Flutter build
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.pub-cache
+            Frontend/build/
+          key: ${{ runner.os }}-flutter-${{ hashFiles('Frontend/**/pubspec.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-flutter-
+        working-directory: Frontend  # Specify working directory for caching Flutter build outputs
+
+      - name: Install Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: "zulu"
+          java-version: "17"
+        working-directory: Frontend  # Java installation should happen in the 'Frontend' directory
+
+      # --- Android Build and Release (Windows or Ubuntu) ---
+      - name: Build APK
+        if: runner.os == 'Windows' || runner.os == 'ubuntu-latest'
+        run: flutter build apk --release --split-per-abi
+        working-directory: Frontend  # Specify working directory for building the APK
+
+      - name: Push Android APK
+        if: runner.os == 'Windows' || runner.os == 'ubuntu-latest'
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: Frontend/build/app/outputs/apk/release/*.apk
+          tag: v1.0.${{ github.run_number }}
+          token: ${{ secrets.DEPLOY_TOKEN }}
+        working-directory: Frontend  # Specify working directory for pushing the APK
+
+      # --- iOS Build and Release (macOS only) ---
+      - name: Build iOS
+        if: runner.os == 'macos-latest'
+        run: |
+          flutter build ios --no-codesign
+          cd build/ios/iphoneos
+          mkdir Payload
+          cd Payload
+          ln -s ../Runner.app
+          cd ..
+          zip -r app.ipa Payload
+        working-directory: Frontend  # Specify working directory for building the iOS app
+
+      - name: Push iOS IPA
+        if: runner.os == 'macos-latest'
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: Frontend/build/ios/iphoneos/app.ipa
+          tag: v1.0.${{ github.run_number }}
+          token: ${{ secrets.DEPLOY_TOKEN }}
+        working-directory: Frontend  # Specify working directory for pushing the IPA
