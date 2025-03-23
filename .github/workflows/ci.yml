@@ -19,11 +19,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      # Create mock .env file (if you need it in CI)
-      - name: Create mock .env file
-        run: echo "GOOGLE_MAP_API_KEY=your_mock_api_key" > Frontend/.env
-        working-directory: Frontend  # Specify that this should run in the 'Frontend' directory
-
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
