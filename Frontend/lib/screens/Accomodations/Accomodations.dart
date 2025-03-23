@@ -401,7 +401,7 @@ class _AccommodationScreenState extends State<AccommodationScreen> {
                                 ),
                                 SizedBox(height: 20),
                                 Text(
-                                  "No transportations found",
+                                  "No Accommodations found",
                                   style: TextStyle(
                                       fontSize: 16, color: Colors.grey),
                                 ),
