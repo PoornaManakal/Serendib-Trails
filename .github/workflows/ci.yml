@@ -19,15 +19,10 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-        # Create Frontend directory if it doesn't exist
-      - name: Ensure Frontend directory exists
-        run: mkdir -p Frontend  # Creates the 'Frontend' directory if it doesn't exist
-
-      # Create the .env file with the Google Maps API key from GitHub Secrets
+        # Create the .env file inside the 'Frontend' directory using the Google Maps API key
       - name: Create .env file with Google Maps API Key
         run: echo "GOOGLE_MAPS_API_KEY=${{ secrets.GOOGLE_MAPS_API_KEY }}" > Frontend/.env
-        working-directory: Frontend  # Ensure this runs in the 'Frontend' directory where pubspec.yaml is located
-
+        working-directory: .  # Ensures this command runs in the root directory to access Frontend
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
