@@ -29,7 +29,6 @@ jobs:
         with:
           channel: "stable"
           architecture: x64
-        working-directory: Frontend  # Correctly added working-directory for this step
 
       # Cache Flutter dependencies to speed up future runs
       - name: Cache Flutter dependencies
